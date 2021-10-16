@@ -1,10 +1,26 @@
-<?php include('server.php') ?>
+<?php
+include('../backend/server.php');
+
+if (!isset($_SESSION['username'])) {
+    array_push($errors, "You must be logged in first");
+    header('location: ../pages/login.php');
+}
+
+foreach ($_GET as $key => $value)
+{
+    if (strpos($value, "user_") !== false) {
+        $_SESSION['target_search'] = str_replace_first("user_", "", $value);
+        header("location: ../pages/target_account.php");
+    }
+}
+
+?>
 <!DOCTYPE html>
 <html>
 
 <head>
     <title>Search</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
 
 <body>
@@ -12,14 +28,16 @@
         <h2>Search result</h2>
     </div>
     <div class="content">
+        <p><a class="btn" href="../pages/index.php">Back</a></p>
         <?php
 
-        if (isset($_POST['search'])) {
-            $search = $_POST['search'];
-            $query = "SELECT * FROM users WHERE username LIKE '%$search%'";
+        if (isset($_SESSION['search'])) {
+            $target = $_SESSION['search'];
+            $query = "SELECT * FROM users WHERE username LIKE '%$target%'";
             $result = mysqli_query($db, $query);
 
             if (mysqli_num_rows($result) > 0) {
+                echo mysqli_num_rows($result) . " results found" . "<br><br>";
                 while ($row = mysqli_fetch_assoc($result)) {
                     $display = "Username: " . $row["username"];
                     if (!empty($row["firstname"]) || !empty($row["lastname"])) {
@@ -30,7 +48,8 @@
                         if (!empty($row["lastname"]))
                             $display .= $row["lastname"];
                     }
-                    echo $display . "<br>";
+                    $search_username = $row['username'];
+                    echo "<p><a href='../pages/search.php?target=user_$search_username'>" . $display . "</a></p><br>";
                 }
             } else {
                 echo "No results";

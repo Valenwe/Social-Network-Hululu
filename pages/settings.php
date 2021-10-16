@@ -1,17 +1,24 @@
-<?php include('server.php') ?>
+<?php
+include('../backend/server.php');
+
+if (!isset($_SESSION['username'])) {
+    array_push($errors, "You must be logged in first");
+    header('location: ../pages/login.php');
+} 
+?>
 <!DOCTYPE html>
 <html>
 
 <head>
     <title>Account Settings</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
 
 <body>
     <form method="post">
-        <button class="btn" onclick="history.back()">Back</button>
-        <?php include('errors.php'); ?>
+        <?php include('../backend/popup.php'); ?>
+        <p><a class="btn" href="../pages/index.php">Back</a></p>
         <div class="input-group">
             <label>Add / Change First Name</label>
             <input type="text" name="set_firstname" , placeholder="<?php if (isset($_SESSION['firstname'])) echo $_SESSION['firstname'] ?>">
