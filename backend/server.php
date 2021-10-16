@@ -1,40 +1,12 @@
 <?php
-// https://www.writephponline.com/
-function debug($msg, $exit)
-{
-    echo '<pre>';
-    print_r($msg);
-    if ($exit) {
-        exit;
-    }
-}
-
-// on attribue toutes les valeurs de la session (pour du local)
-function set_session_value($user)
-{
-    $_SESSION['username'] = $user['username'];
-    $_SESSION['id'] = $user['id'];
-    $_SESSION['email'] = $user['email'];
-    if (!is_null($user['firstname'])) {
-        $_SESSION['firstname'] = $user['firstname'];
-    }
-    if (!is_null($user['lastname'])) {
-        $_SESSION['lastname'] = $user['lastname'];
-    }
-    if (!empty($user['followers'])) {
-        $_SESSION['followers'] = $user['followers'];
-    }
-    if (!empty($user['following'])) {
-        $_SESSION['following'] = $user['following'];
-    }
-}
-
+include "../backend/functions.php";
 session_start();
 
 // initializing variables
 $username = "";
 $email    = "";
 $errors = array();
+$_SESSION['success'] = array();
 
 // connect to the database
 // root -> password
@@ -99,8 +71,8 @@ if (isset($_POST['reg_user'])) {
 
             set_session_value(mysqli_fetch_assoc($result));
             if (isset($_SESSION['username'])) {
-                $_SESSION['success'] = "You are now logged in";
-                header('location: index.php');
+                array_push($_SESSION['success'], "You are now logged in");
+                header('location: ../pages/index.php');
             } else {
                 array_push($errors, "Error trying to create a new user");
             }
@@ -127,8 +99,8 @@ if (isset($_POST['log_user'])) {
         $user = mysqli_fetch_assoc($results);
         if (password_verify($password, $user['password'])) {
             set_session_value($user);
-            $_SESSION['success'] = "You are now logged in";
-            header('location: index.php');
+            array_push($_SESSION['success'], "You are now logged in");
+            header('location: ../pages/index.php');
         } else {
             array_push($errors, "Wrong username/password combination");
         }
@@ -218,8 +190,8 @@ if (isset($_POST['set_change'])) {
     }
     
     if (count($errors) == 0) {
-        $_SESSION['success'] = "Changes saved successfully";
-        header("location: index.php");
+        array_push($_SESSION['success'], "Changes saved successfully");
+        header("location: ../pages/index.php");
     }
 }
 
@@ -232,4 +204,6 @@ if (isset($_POST['set_reset_name'])) {
 
     unset($_SESSION['firstname']);
     unset($_SESSION['lastname']);
+
+    array_push($_SESSION['success'], "Name reset");
 }
