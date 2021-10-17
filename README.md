@@ -29,3 +29,11 @@ CREATE TABLE `users` (
 
 Then go in its root folder, and create a new directory inside `/htdocs/`
 After that, paste the ZIP content of the repository, and then the website will be available at `localhost/%your_directory_name%/register.php`
+
+## To-Do list
+Avatar image system for each user
+Auto refresh pages (Ajax query?) for new notifications
+Friend system
+Private messaging system
+Publication system
+Admin remote control panel
