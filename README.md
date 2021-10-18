@@ -30,6 +30,16 @@ CREATE TABLE `users` (
 Then go in its root folder, and create a new directory inside `/htdocs/`
 After that, paste the ZIP content of the repository, and then the website will be available at `localhost/%your_directory_name%/register.php`
 
+Then, go in `/apache/conf`, and change the file `httpd.conf`:
+* Remove the '#' from `#LoadModule rewrite_module modules/mod_rewrite.so`
+* Change all `AllowOverride None` to `AllowOverride All`
+
+Also, create a .htaccess file in the htdocs folder, and add the following content:
+```
+ErrorDocument 404 /sn/404.php
+RewriteEngine On
+```
+
 ## To-Do list
 * Avatar image system for each user
 * Auto refresh pages (Ajax query?) for new notifications
