@@ -1,5 +1,5 @@
 <?php 
-include('../sn/backend/server.php') ?>
+include('../backend/server.php') ?>
 <!DOCTYPE html>
 <html>
 
@@ -15,7 +15,7 @@ include('../sn/backend/server.php') ?>
     </div>
 
     <form method="post">
-        <?php include('../sn/backend/popup.php'); ?>
+        <?php include('../backend/popup.php'); ?>
         <div class="input-group">
             <label>Username</label>
             <input type="text" name="reg_username">

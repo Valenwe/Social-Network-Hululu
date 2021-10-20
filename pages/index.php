@@ -56,7 +56,7 @@ if (isset($_GET['search'])) {
     </div>
     <div class="content">
         <!-- notification message -->
-        <?php include('../sn/backend/popup.php'); ?>
+        <?php include('../backend/popup.php'); ?>
 
         <!-- logged in user information -->
         <?php if (isset($_SESSION['username'])) : ?>
