@@ -44,7 +44,7 @@ RewriteRule ^(.*)$ url.php [QSA,L]
 
 The website should now be available at `localhost/register`.
 
-## To-Do list
+## To-Do list:
 * Avatar image system for each user
 * Auto refresh pages (Ajax query?) for new notifications
 * Friend system
