@@ -27,8 +27,8 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1
 ```
 
-Then go in its root folder, and create a new directory inside `/htdocs/`
-After that, paste the ZIP content of the repository, and then the website will be available at `localhost/%your_directory_name%/register.php`
+Then go in its root folder, and create a new directory inside `/htdocs/`, called `sn`
+After that, paste the ZIP content of the repository, and then the website will be available at `localhost/sn/register.php`
 
 Then, go in `/apache/conf`, and change the file `httpd.conf`:
 * Remove the '#' from `#LoadModule rewrite_module modules/mod_rewrite.so`
@@ -36,9 +36,13 @@ Then, go in `/apache/conf`, and change the file `httpd.conf`:
 
 Also, create a .htaccess file in the htdocs folder, and add the following content:
 ```
-ErrorDocument 404 /sn/404.php
-RewriteEngine On
+RewriteEngine on
+RewriteBase /sn/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ url.php [QSA,L]
 ```
+
+The website should now be available at `localhost/register`.
 
 ## To-Do list
 * Avatar image system for each user
