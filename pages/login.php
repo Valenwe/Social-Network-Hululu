@@ -1,4 +1,4 @@
-<?php include('../sn/backend/server.php') ?>
+<?php include('../backend/server.php')?>
 <!DOCTYPE html>
 <html>
 
@@ -13,7 +13,7 @@
     </div>
 
     <form method="post">
-        <?php include('../sn/backend/popup.php'); ?>
+        <?php include('../backend/popup.php'); ?>
         <div class="input-group">
             <label>Username</label>
             <input type="text" name="log_username">

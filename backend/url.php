@@ -18,9 +18,9 @@ $uri = urldecode($uri);
 // echo $uri;
 foreach ($rules as $url => $new_url) {
     if (preg_match('/' . $new_url . '/', $uri)) {
-        require("pages/" . $url . '.php');
+        require("../pages/" . $url . '.php');
         exit();
     }
 }
 // Si rien n'est trouvé, on affiche une page 404.php
-include('pages/404.php');
+include('../pages/404.php');

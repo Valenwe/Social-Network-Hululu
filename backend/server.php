@@ -1,5 +1,5 @@
 <?php
-include "../sn/backend/functions.php";
+include "../backend/functions.php";
 session_start();
 
 // initializing variables
@@ -63,7 +63,7 @@ if (isset($_POST['reg_user'])) {
             $password = password_hash($password_1, PASSWORD_BCRYPT); //encrypt the password before saving in the database
 
             // '".$password."' -> au cas où il y a des espaces
-            $query = "INSERT INTO users (username, email, password, following, followers) VALUES('$username', '$email', '" . $password . "', '', '')";
+            $query = "INSERT INTO users (username, email, password, following, followers, publications) VALUES('$username', '$email', '" . $password . "', '', '', '')";
             $result = mysqli_query($db, $query);
 
             $query = "SELECT * FROM users WHERE username='" . $username . "'";
@@ -72,7 +72,7 @@ if (isset($_POST['reg_user'])) {
             set_session_value(mysqli_fetch_assoc($result));
             if (isset($_SESSION['username'])) {
                 array_push($_SESSION['success'], "You are now logged in");
-                header('location: ../home');
+                header('location: /home');
             } else {
                 array_push($errors, "Error trying to create a new user");
             }
@@ -191,7 +191,7 @@ if (isset($_POST['set_change'])) {
     
     if (count($errors) == 0) {
         array_push($_SESSION['success'], "Changes saved successfully");
-        header("location: ../home");
+        header("location: /home");
     }
 }
 

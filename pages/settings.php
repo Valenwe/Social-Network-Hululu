@@ -1,5 +1,5 @@
 <?php
-include('../sn/backend/server.php');
+include('../backend/server.php');
 
 if (!isset($_SESSION['username'])) {
     array_push($errors, "You must be logged in first");
@@ -17,7 +17,7 @@ if (!isset($_SESSION['username'])) {
 
 <body>
     <form method="post">
-        <?php include('../sn/backend/popup.php'); ?>
+        <?php include('../backend/popup.php'); ?>
         <p><a class="btn" href="/home">Back</a></p>
         <div class="input-group">
             <label>Add / Change First Name</label>
