@@ -10,8 +10,8 @@
 
 ## How to install the project:
 
-You first need to install XAMPP, 
-Then go to the Admin page of MySQL (`localhost/phpmyadmin/`), and create a new database names `registration` and a new table with that SQL request:
+* You first need to install XAMPP, 
+* Then go to the Admin page of MySQL (`localhost/phpmyadmin/`), and create a new database names `registration` and a new table with that SQL request:
 ```
 CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -28,14 +28,14 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin
 ```
 
-Then go in its root folder, and create a new directory inside `/htdocs/`, called `sn`
-After that, paste the ZIP content of the repository inside that new directory.
+* Then go in its root folder, and create a new directory inside `/htdocs/`, called `sn`
+* After that, paste the ZIP content of the repository inside that new directory.
 
-Then, go in `/apache/conf`, and change the file `httpd.conf`:
-* Remove the '#' from `#LoadModule rewrite_module modules/mod_rewrite.so`
-* Change all `AllowOverride None` to `AllowOverride All`
+* Then, go in `/apache/conf`, and change the file `httpd.conf`:
+--> Remove the '#' from `#LoadModule rewrite_module modules/mod_rewrite.so`
+--> Change all `AllowOverride None` to `AllowOverride All`
 
-Also, create a .htaccess file in the htdocs folder, and add the following content:
+* Also, create a .htaccess file in the htdocs folder, and add the following content:
 ```
 RewriteEngine on
 RewriteBase /sn/
