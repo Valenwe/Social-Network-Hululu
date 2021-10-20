@@ -1,16 +1,16 @@
 <?php
-include('../backend/server.php');
+include('../sn/backend/server.php');
 
 if (!isset($_SESSION['username'])) {
     array_push($errors, "You must be logged in first");
-    header('location: ../pages/login.php');
+    header('location: /login');
 }
 
 foreach ($_GET as $key => $value)
 {
     if (strpos($value, "user_") !== false) {
         $_SESSION['target_search'] = str_replace_first("user_", "", $value);
-        header("location: ../pages/target_account.php");
+        header("location: /user=" . $_SESSION['target_search']);
     }
 }
 
@@ -20,7 +20,7 @@ foreach ($_GET as $key => $value)
 
 <head>
     <title>Search</title>
-    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" type="text/css" href="../sn/style.css">
 </head>
 
 <body>
@@ -28,7 +28,7 @@ foreach ($_GET as $key => $value)
         <h2>Search result</h2>
     </div>
     <div class="content">
-        <p><a class="btn" href="../pages/index.php">Back</a></p>
+        <p><a class="btn" href="/home">Back</a></p>
         <?php
 
         if (isset($_SESSION['search'])) {
@@ -49,7 +49,7 @@ foreach ($_GET as $key => $value)
                             $display .= $row["lastname"];
                     }
                     $search_username = $row['username'];
-                    echo "<p><a href='../pages/search.php?target=user_$search_username'>" . $display . "</a></p><br>";
+                    echo "<p><a href='/search?target=user_$search_username'>" . $display . "</a></p><br>";
                 }
             } else {
                 echo "No results";

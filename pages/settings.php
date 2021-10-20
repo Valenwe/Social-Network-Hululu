@@ -1,9 +1,9 @@
 <?php
-include('../backend/server.php');
+include('../sn/backend/server.php');
 
 if (!isset($_SESSION['username'])) {
     array_push($errors, "You must be logged in first");
-    header('location: ../pages/login.php');
+    header('location: /login');
 } 
 ?>
 <!DOCTYPE html>
@@ -12,13 +12,13 @@ if (!isset($_SESSION['username'])) {
 <head>
     <title>Account Settings</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" type="text/css" href="../sn/style.css">
 </head>
 
 <body>
     <form method="post">
-        <?php include('../backend/popup.php'); ?>
-        <p><a class="btn" href="../pages/index.php">Back</a></p>
+        <?php include('../sn/backend/popup.php'); ?>
+        <p><a class="btn" href="/home">Back</a></p>
         <div class="input-group">
             <label>Add / Change First Name</label>
             <input type="text" name="set_firstname" , placeholder="<?php if (isset($_SESSION['firstname'])) echo $_SESSION['firstname'] ?>">

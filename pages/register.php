@@ -1,12 +1,12 @@
 <?php 
-include('../backend/server.php') ?>
+include('../sn/backend/server.php') ?>
 <!DOCTYPE html>
 <html>
 
 <head>
     <meta charset="utf-8" />
     <title>Register account</title>
-    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" type="text/css" href="../sn/style.css">
 </head>
 
 <body>
@@ -15,7 +15,7 @@ include('../backend/server.php') ?>
     </div>
 
     <form method="post">
-        <?php include('../backend/popup.php'); ?>
+        <?php include('../sn/backend/popup.php'); ?>
         <div class="input-group">
             <label>Username</label>
             <input type="text" name="reg_username">
@@ -36,7 +36,7 @@ include('../backend/server.php') ?>
             <button type="submit" class="btn" name="reg_user" value="1">Register</button>
         </div>
         <p>
-            Already a member? <a href="../pages/login.php">Sign in</a>
+            Already a member? <a href="/login">Sign in</a>
         </p>
     </form>
 </body>
