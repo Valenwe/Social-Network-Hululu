@@ -28,7 +28,7 @@ CREATE TABLE `users` (
 ```
 
 Then go in its root folder, and create a new directory inside `/htdocs/`, called `sn`
-After that, paste the ZIP content of the repository, and then the website will be available at `localhost/sn/register.php`
+After that, paste the ZIP content of the repository inside that new directory.
 
 Then, go in `/apache/conf`, and change the file `httpd.conf`:
 * Remove the '#' from `#LoadModule rewrite_module modules/mod_rewrite.so`
