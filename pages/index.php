@@ -2,28 +2,30 @@
 session_start();
 
 if (!isset($_SESSION['username'])) {
+    if (!isset($errors))
+        $errors = array();
     array_push($errors, "You must be logged in first");
-    header('location: ../pages/login.php');
+    header('location: /login');
 }
 
 if (isset($_GET['logout'])) {
     session_destroy();
     unset($_SESSION['username']);
     unset($_SESSION['id']);
-    header("location: ../pages/login.php");
+    header("location: /login");
 }
 
 if (isset($_GET['settings'])) {
-    header("location: ../pages/settings.php");
+    header("location: /settings");
 }
 
 if (isset($_GET['account'])) {
-    header("location: ../pages/account.php");
+    header("location: /me");
 }
 
 if (isset($_GET['search'])) {
     $_SESSION['search'] = $_POST['ind_search_content'];
-    header("location: ../pages/search.php");
+    header("location: /search");
 }
 ?>
 <!DOCTYPE html>
@@ -32,18 +34,18 @@ if (isset($_GET['search'])) {
 <head>
     <meta charset="utf-8" />
     <title>Home</title>
-    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" type="text/css" href="../sn/style.css">
 </head>
 
 <body>
 
     <div class="header">
         <h2>Home Page</h2>
-        <p> <a href="../pages/index.php?account=1" style="color:green;">Account</a></p>
-        <p> <a href="../pages/index.php?settings='1'" style="color:blue;">Settings</a></p>
-        <p> <a href="../pages/index.php?logout='1'" style="color: red;">Logout</a> </p>
+        <p> <a href="/home?account=1" style="color:green;">Account</a></p>
+        <p> <a href="/home?settings='1'" style="color:blue;">Settings</a></p>
+        <p> <a href="/home?logout='1'" style="color: red;">Logout</a> </p>
 
-        <form method="post" action="../pages/index.php?search=1">
+        <form method="post" action="/home?search=1">
             <div class="input-group">
                 <input type="text" name="ind_search_content" placeholder="Search">
             </div>
@@ -54,7 +56,7 @@ if (isset($_GET['search'])) {
     </div>
     <div class="content">
         <!-- notification message -->
-        <?php include('../backend/popup.php'); ?>
+        <?php include('../sn/backend/popup.php'); ?>
 
         <!-- logged in user information -->
         <?php if (isset($_SESSION['username'])) : ?>

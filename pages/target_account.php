@@ -1,9 +1,9 @@
 <?php
-include('../backend/server.php');
+include('../sn/backend/server.php');
 
 if (!isset($_SESSION['username'])) {
     array_push($errors, "You must be logged in first");
-    header("location: ../pages/login.php");
+    header("location: /login");
 }
 
 if (isset($_SESSION['target_search'])) {
@@ -22,7 +22,7 @@ if (isset($_SESSION['target_search'])) {
 <head>
     <title>Account Page</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" type="text/css" href="../sn/style.css">
 </head>
 
 <body>

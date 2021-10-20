@@ -1,5 +1,5 @@
 <?php
-include "../backend/functions.php";
+include "../sn/backend/functions.php";
 session_start();
 
 // initializing variables
@@ -72,7 +72,7 @@ if (isset($_POST['reg_user'])) {
             set_session_value(mysqli_fetch_assoc($result));
             if (isset($_SESSION['username'])) {
                 array_push($_SESSION['success'], "You are now logged in");
-                header('location: ../pages/index.php');
+                header('location: ../home');
             } else {
                 array_push($errors, "Error trying to create a new user");
             }
@@ -100,7 +100,7 @@ if (isset($_POST['log_user'])) {
         if (password_verify($password, $user['password'])) {
             set_session_value($user);
             array_push($_SESSION['success'], "You are now logged in");
-            header('location: ../pages/index.php');
+            header('location: /home');
         } else {
             array_push($errors, "Wrong username/password combination");
         }
@@ -191,7 +191,7 @@ if (isset($_POST['set_change'])) {
     
     if (count($errors) == 0) {
         array_push($_SESSION['success'], "Changes saved successfully");
-        header("location: ../pages/index.php");
+        header("location: ../home");
     }
 }
 
