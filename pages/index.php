@@ -1,11 +1,18 @@
 <?php
+include "../backend/functions.php";
 session_start();
+$errors = array();
+$success = array();
 
 if (!isset($_SESSION['username'])) {
-    if (!isset($errors))
-        $errors = array();
     array_push($errors, "You must be logged in first");
+    $_SESSION["errors"] = $errors;
     header('location: /login');
+}
+
+if (!empty($_SESSION["success"])) {
+    $success = $_SESSION["success"];
+    unset($_SESSION["success"]);
 }
 
 if (isset($_GET['logout'])) {
@@ -15,18 +22,44 @@ if (isset($_GET['logout'])) {
     header("location: /login");
 }
 
-if (isset($_GET['settings'])) {
+if (isset($_GET['settings']))
     header("location: /settings");
-}
 
-if (isset($_GET['account'])) {
+
+if (isset($_GET['account']))
     header("location: /me");
-}
+
 
 if (isset($_GET['search'])) {
     $_SESSION['search'] = $_POST['ind_search_content'];
     header("location: /search");
+} else {
+    // pour retirer la dernière recherche qui ne sert plus
+    if (isset($_SESSION["search"]))
+        unset($_SESSION["search"]);
 }
+
+if (isset($_GET['new_post']))
+    header("location: /post");
+
+
+$displayed_publications = array();
+if (!empty($_SESSION["following"])) {
+    $displayed_publications = get_most_recent_publication(10);
+}
+
+if (isset($_GET["delete"])) {
+    $post_id = $_GET["delete"];
+    $query = "DELETE FROM publications WHERE post_id='$post_id'";
+    $result = mysqli_query($db, $query);
+    if ($result) {
+        array_push($success, "Publications deleted successfully");
+    } else {
+        array_push($errors, "Error trying to remove the publications");
+    }
+}
+
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -41,6 +74,7 @@ if (isset($_GET['search'])) {
 
     <div class="header">
         <h2>Home Page</h2>
+        <p> <a href="/home?new_post=1" style="color:purple;">New publication</a></p>
         <p> <a href="/home?account=1" style="color:green;">Account</a></p>
         <p> <a href="/home?settings='1'" style="color:blue;">Settings</a></p>
         <p> <a href="/home?logout='1'" style="color: red;">Logout</a> </p>
@@ -56,13 +90,17 @@ if (isset($_GET['search'])) {
     </div>
     <div class="content">
         <!-- notification message -->
-        <?php include('../backend/popup.php'); ?>
+        <?php require('../backend/popup.php'); ?>
 
         <!-- logged in user information -->
         <?php if (isset($_SESSION['username'])) : ?>
             <p>Welcome <strong><?php echo $_SESSION['username']; ?></strong></p>
             <p> <?php if (isset($_SESSION['firstname']) && isset($_SESSION['lastname'])) echo $_SESSION['firstname'] . " " . $_SESSION['lastname']; ?></p>
         <?php endif ?>
+    </div>
+
+    <div class="content">
+        <?php display_publications($displayed_publications) ?>
     </div>
 
 </body>

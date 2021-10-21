@@ -6,12 +6,17 @@ session_start();
 $username = "";
 $email    = "";
 $errors = array();
-$_SESSION['success'] = array();
+$success = array();
+
+if (!empty($_SESSION["errors"])) {
+    $errors = $_SESSION["errors"];
+    unset($_SESSION["errors"]);
+}
 
 // connect to the database
 // root -> password
 // mysql.exe -u root --password
-$db = mysqli_connect('localhost', 'root', 'root', 'registration');
+$db = mysqli_connect('localhost', 'root', 'root', 'hululu');
 
 // REGISTER USER
 if (isset($_POST['reg_user'])) {
@@ -43,7 +48,7 @@ if (isset($_POST['reg_user'])) {
 
         // first check the database to make sure 
         // a user does not already exist with the same username and/or email
-        $user_check_query = "SELECT * FROM users WHERE username=$username OR email=$email LIMIT 1";
+        $user_check_query = "SELECT * FROM users WHERE username=$username OR email=$email";
         $result = mysqli_query($db, $user_check_query);
         if (!empty($result)) {
             $user = mysqli_fetch_assoc($result);
@@ -63,7 +68,7 @@ if (isset($_POST['reg_user'])) {
             $password = password_hash($password_1, PASSWORD_BCRYPT); //encrypt the password before saving in the database
 
             // '".$password."' -> au cas où il y a des espaces
-            $query = "INSERT INTO users (username, email, password, following, followers, publications) VALUES('$username', '$email', '" . $password . "', '', '', '')";
+            $query = "INSERT INTO users (username, email, password, following, follower) VALUES('$username', '$email', '" . $password . "', '', '')";
             $result = mysqli_query($db, $query);
 
             $query = "SELECT * FROM users WHERE username='" . $username . "'";
@@ -71,7 +76,8 @@ if (isset($_POST['reg_user'])) {
 
             set_session_value(mysqli_fetch_assoc($result));
             if (isset($_SESSION['username'])) {
-                array_push($_SESSION['success'], "You are now logged in");
+                array_push($success, "You are now logged in");
+                $_SESSION["success"] = $success;
                 header('location: /home');
             } else {
                 array_push($errors, "Error trying to create a new user");
@@ -95,11 +101,12 @@ if (isset($_POST['log_user'])) {
 
     if (count($errors) == 0) {
         $query = "SELECT * FROM users WHERE username='$username'";
-        $results = mysqli_query($db, $query);
-        $user = mysqli_fetch_assoc($results);
+        $result = mysqli_query($db, $query);
+        $user = mysqli_fetch_assoc($result);
         if (password_verify($password, $user['password'])) {
             set_session_value($user);
-            array_push($_SESSION['success'], "You are now logged in");
+            array_push($success, "You are now logged in");
+            $_SESSION["success"] = $success;
             header('location: /home');
         } else {
             array_push($errors, "Wrong username/password combination");
@@ -190,7 +197,8 @@ if (isset($_POST['set_change'])) {
     }
     
     if (count($errors) == 0) {
-        array_push($_SESSION['success'], "Changes saved successfully");
+        array_push($success, "Changes saved successfully");
+        $_SESSION["success"] = $success;
         header("location: /home");
     }
 }
@@ -205,5 +213,5 @@ if (isset($_POST['set_reset_name'])) {
     unset($_SESSION['firstname']);
     unset($_SESSION['lastname']);
 
-    array_push($_SESSION['success'], "Name reset");
+    array_push($success, "Name reset");
 }

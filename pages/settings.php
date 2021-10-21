@@ -3,6 +3,7 @@ include('../backend/server.php');
 
 if (!isset($_SESSION['username'])) {
     array_push($errors, "You must be logged in first");
+    $_SESSION["errors"] = $errors;
     header('location: /login');
 } 
 ?>
@@ -17,7 +18,7 @@ if (!isset($_SESSION['username'])) {
 
 <body>
     <form method="post">
-        <?php include('../backend/popup.php'); ?>
+        <?php require('../backend/popup.php'); ?>
         <p><a class="btn" href="/home">Back</a></p>
         <div class="input-group">
             <label>Add / Change First Name</label>
