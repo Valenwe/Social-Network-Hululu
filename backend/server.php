@@ -63,7 +63,7 @@ if (isset($_POST['reg_user'])) {
             $password = password_hash($password_1, PASSWORD_BCRYPT); //encrypt the password before saving in the database
 
             // '".$password."' -> au cas où il y a des espaces
-            $query = "INSERT INTO users (username, email, password, following, followers, publications) VALUES('$username', '$email', '" . $password . "', '', '', '')";
+            $query = "INSERT INTO users (username, email, password, following, follower, publications) VALUES('$username', '$email', '" . $password . "', '', '', '')";
             $result = mysqli_query($db, $query);
 
             $query = "SELECT * FROM users WHERE username='" . $username . "'";

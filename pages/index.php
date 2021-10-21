@@ -1,9 +1,9 @@
 <?php
 session_start();
+$errors = array();
+$_SESSION["success"] = array();
 
 if (!isset($_SESSION['username'])) {
-    if (!isset($errors))
-        $errors = array();
     array_push($errors, "You must be logged in first");
     header('location: /login');
 }
@@ -27,6 +27,15 @@ if (isset($_GET['search'])) {
     $_SESSION['search'] = $_POST['ind_search_content'];
     header("location: /search");
 }
+
+// POST
+if (isset($_POST['ind_post'])) {
+    $id = $_SESSION['id'];
+    $title = $_POST["ind_post_title"];
+    $content = $_POST["ind_post_content"];
+    array_push($_SESSION['success'], "Publication posted");
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -51,6 +60,18 @@ if (isset($_GET['search'])) {
             </div>
             <div class="input-group">
                 <button type="submit" class="btn" name="ind_search">Search</button>
+            </div>
+        </form>
+
+        <form method="post">
+            <div class="input-group">
+                <input type="text" name="ind_post_title" placeholder="Title">
+            </div>
+            <div class="input-group">
+                <input type="text" name="ind_post_content" placeholder="Text">
+            </div>
+            <div class="input-group">
+                <button type="submit" class="btn" name="ind_post">Post</button>
             </div>
         </form>
     </div>

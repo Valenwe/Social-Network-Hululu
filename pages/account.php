@@ -5,6 +5,16 @@ if (!isset($_SESSION['username'])) {
     array_push($errors, "You must be logged in first");
     header('location: /login');
 }
+
+if (isset($_GET['showfollowing'])) {
+    $_SESSION["showmode"] = "following";
+    header('location: /friends');
+}
+
+if (isset($_GET['showfollower'])) {
+    $_SESSION["showmode"] = "follower";
+    header('location: /friends');
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -23,10 +33,14 @@ if (!isset($_SESSION['username'])) {
         <p><a class="btn" href="/home">Back</a></p>
         <p>Name: <?php if (isset($_SESSION['firstname']) && isset($_SESSION['lastname'])) echo $_SESSION['firstname'] . " " . $_SESSION['lastname']; ?></p>
         <p>Username: <strong><?php echo $_SESSION['username']; ?></strong></p>
-        <p>Followers: <?php if (!empty($_SESSION['followers'])) echo count(json_decode($_SESSION['followers'], true));
-                        else echo 0; ?></p>
-        <p>Following: <?php if (!empty($_SESSION['following'])) echo count(json_decode($_SESSION['following'], true));
-                        else echo 0; ?></p>
+        <a href="/me?showfollower=1">
+            <p>Followers: <?php if (!empty($_SESSION['follower'])) echo count($_SESSION['follower']);
+                            else echo 0; ?></p>
+        </a>
+        <a href='/me?showfollowing=1'>
+            <p>Following: <?php if (!empty($_SESSION['following'])) echo count($_SESSION['following']);
+                            else echo 0 ?></p>
+        </a>
     </div>
 </body>
 
