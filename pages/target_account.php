@@ -3,6 +3,7 @@ include('../backend/server.php');
 
 if (!isset($_SESSION['username'])) {
     array_push($errors, "You must be logged in first");
+    $_SESSION["errors"] = $errors;
     header("location: /login");
 }
 
@@ -18,7 +19,7 @@ if (isset($_SESSION['target_search'])) {
 if (isset($_GET["friend"])) {
     if (add_follow($db, $target)) {
         $target = refresh_user($db, $target);
-        array_push($_SESSION['success'], "Friend added");
+        array_push($success, "Friend added");
     } else {
         array_push($errors, "Error trying to add friend");
     }
@@ -27,7 +28,7 @@ if (isset($_GET["friend"])) {
 if (isset($_GET["unfriend"])) {
     if (remove_follow($db, $target)) {
         $target = refresh_user($db, $target);
-        array_push($_SESSION['success'], "Friend removed");
+        array_push($success, "Friend removed");
     } else {
         array_push($errors, "Error trying to remove friend");
     }
@@ -50,7 +51,7 @@ if (isset($_GET["unfriend"])) {
 
     <div class="content">
         <?php include "../backend/popup.php" ?>
-        <p><a class="btn" href="/me">Back</a></p>
+        <p><a class="btn" href="/search">Back</a></p>
         <?php if (isset($target)) : ?>
             <?php if (!is_following($target["id"])) : ?>
                 <p><a href=<?php echo $_SERVER["REQUEST_URI"] . "?friend=1" ?>>Add friend</a></p>

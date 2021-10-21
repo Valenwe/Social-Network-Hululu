@@ -3,6 +3,7 @@ include('../backend/server.php');
 
 if (!isset($_SESSION['username'])) {
     array_push($errors, "You must be logged in first");
+    $_SESSION["errors"] = $errors;
     header('location: /login');
 }
 
@@ -29,7 +30,7 @@ foreach ($_GET as $key => $value) {
 
 <body>
     <div class="header">
-        <h2>Search result</h2>
+        <h2>Search results</h2>
     </div>
     <div class="content">
         <p><a class="btn" href="/home">Back</a></p>
@@ -38,11 +39,11 @@ foreach ($_GET as $key => $value) {
         if (isset($_SESSION['search'])) {
             $target = $_SESSION['search'];
             $query = "SELECT * FROM users WHERE username LIKE '%$target%'";
-            $result = mysqli_query($db, $query);
+            $results = mysqli_query($db, $query);
 
-            if (mysqli_num_rows($result) > 0) {
-                echo mysqli_num_rows($result) . " results found" . "<br><br>";
-                while ($row = mysqli_fetch_assoc($result)) {
+            if (mysqli_num_rows($results) > 0) {
+                echo mysqli_num_rows($results) . " results found" . "<br><br>";
+                while ($row = mysqli_fetch_assoc($results)) {
                     $display = "Username: " . $row["username"];
                     if (!empty($row["firstname"]) || !empty($row["lastname"])) {
                         $display .= " - Name: ";

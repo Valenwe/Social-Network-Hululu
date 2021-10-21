@@ -9,7 +9,8 @@ $rules = array(
     "search" => "search",
     "settings" => "settings",
     "target_account" => "user=",
-    "user_list" => "friends"
+    "user_list" => "friends",
+    "post" => "post"
 );
 
 $uri = rtrim(dirname($_SERVER["SCRIPT_NAME"]), '/');

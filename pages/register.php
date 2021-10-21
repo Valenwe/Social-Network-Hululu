@@ -15,7 +15,7 @@ include('../backend/server.php') ?>
     </div>
 
     <form method="post">
-        <?php include('../backend/popup.php'); ?>
+        <?php require('../backend/popup.php'); ?>
         <div class="input-group">
             <label>Username</label>
             <input type="text" name="reg_username">

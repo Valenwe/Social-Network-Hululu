@@ -3,6 +3,7 @@ include('../backend/server.php');
 
 if (!isset($_SESSION['username'])) {
     array_push($errors, "You must be logged in first");
+    $_SESSION["errors"] = $errors;
     header('location: /login');
 }
 

@@ -6,9 +6,9 @@
     </div>
 <?php endif ?>
 
-<?php if (!empty($_SESSION['success'])) : ?>
+<?php if (!empty($success)) : ?>
     <div class="success">
-        <?php foreach ($_SESSION['success'] as $suc) : ?>
+        <?php foreach ($success as $suc) : ?>
             <p><?php echo $suc ?></p>
         <?php endforeach ?>
     </div>
