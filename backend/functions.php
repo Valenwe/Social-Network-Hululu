@@ -15,6 +15,10 @@ function set_session_value($user)
     $_SESSION['username'] = $user['username'];
     $_SESSION['id'] = $user['id'];
     $_SESSION['email'] = $user['email'];
+
+    $_SESSION['follower'] = array();
+    $_SESSION['following'] = array();
+
     if (!is_null($user['firstname'])) {
         $_SESSION['firstname'] = $user['firstname'];
     }
@@ -26,6 +30,17 @@ function set_session_value($user)
     }
     if (!empty($user['following'])) {
         $_SESSION['following'] = explode(" ", $user['following']);
+    }
+}
+
+// check si quelqu'un ne possède pas toutes les variables de session
+function check_session_variables()
+{
+    if (!isset($_SESSION["username"]) || !isset($_SESSION["id"]) || !isset($_SESSION["email"]) || !isset($_SESSION["following"]) || !isset($_SESSION["follower"])) {
+
+        $_SESSION["errors"] = array();
+        array_push($_SESSION["errors"], "You must be logged in first");
+        header('location: /login');
     }
 }
 
@@ -134,11 +149,12 @@ function refresh_user($db, $user)
 // addslashes permet de gérer les caractères problématiques comme ' \ " 
 function post($id, $title, $content)
 {
+    include "../backend/db.php";
+
     $title = addslashes($title);
     $content = addslashes($content);
 
-    $db = mysqli_connect('localhost', 'root', 'root', 'hululu');
-    $query = "INSERT INTO publications (id, title, content) VALUES('$id', '" . $title . "', '" . $content . "')";
+    $query = "INSERT INTO publications (id, title, content, comments, likes) VALUES('$id', '" . $title . "', '" . $content . "', '', '')";
     mysqli_query($db, $query);
 
     // get process id
@@ -147,30 +163,17 @@ function post($id, $title, $content)
     mysqli_kill($db, $db_id);
 }
 
-// récupère les publications d'un utilisateur
-function get_publication($db, $id)
-{
-    $query = "SELECT * FROM publications WHERE id='$id'";
-    $results = mysqli_query($db, $query);
-    if ($results) {
-        $publications = array();
-        if (mysqli_num_rows($results) > 0) {
-            while ($row = mysqli_fetch_assoc($results)) {
-                $row["title"] = stripslashes($row["title"]);
-                $row["content"] = stripslashes($row["content"]);
-                array_push($publications, $row);
-            }
-        }
-        return $publications;
-    } else {
-        return null;
-    }
-}
-
+// récupère les plus récentes publications
 function get_most_recent_publication($limit)
 {
-    $db = mysqli_connect('localhost', 'root', 'root', 'hululu');
-    $following = $_SESSION["following"];
+    check_session_variables();
+    include "../backend/db.php";
+    $following = array();
+
+    if (strpos($_SERVER['REQUEST_URI'], "home")) {
+        $following = $_SESSION["following"];
+    }
+
 
     // on ajoute aussi l'id de la session
     array_push($following, $_SESSION["id"]);
@@ -179,9 +182,7 @@ function get_most_recent_publication($limit)
     $query = "SELECT * FROM publications WHERE id IN $following_str ORDER BY creation_date DESC LIMIT $limit";
     $results = mysqli_query($db, $query);
 
-    // get process id
     $db_id = mysqli_thread_id($db);
-    // Kill connection
     mysqli_kill($db, $db_id);
 
     if ($results) {
@@ -202,7 +203,7 @@ function get_most_recent_publication($limit)
 // récupère un utilisateur avec un id
 function get_user($id)
 {
-    $db = mysqli_connect('localhost', 'root', 'root', 'hululu');
+    include "../backend/db.php";
 
     $query = "SELECT * FROM users WHERE id='$id'";
     $result = mysqli_query($db, $query);
@@ -223,31 +224,55 @@ function get_user($id)
 // print une liste de publications données
 function display_publications($publications)
 {
+    $html = "";
     if ($publications != null && count($publications) > 0) {
         foreach ($publications as $post) {
-            echo "<div class='content'> ";
             $title = $post["title"];
             $content = $post["content"];
             $post_id = $post["post_id"];
 
+            // id est nécessaire pour localiser le post si on le delete
+            $html .= "<div class='content post' id=$post_id> ";
+
+            $likes = array();
+            if (!empty($post["likes"])) {
+                $likes = explode(" ", $post["likes"]);
+                // on retire la dernière valeur si elle est vide
+                if (empty(end($likes)))
+                    unset($likes[array_search(end($likes), $likes)]);
+            }
+
             $author = get_user($post["id"]);
             $author_name = $author["username"];
 
-            $uri = $_SERVER['REQUEST_URI'];
-            
             $date_time = new DateTime($post['creation_date']);
             $date = $date_time->format('d/m/y H:i');
 
-            echo "<h3>$title</h3> <p>$date</p>";
-            
-            if ($post["id"] == $_SESSION["id"])
-                echo "<p> <a href='$uri?delete=$post_id'>Delete</a> </p>";
+            $html .= "<h3>$title</h3> <p>$date</p>";
 
-            echo "<p>From $author_name</p> </br>";
-            echo "<p>$content</p>";
-            echo " </div>";
+            if ($post["id"] == $_SESSION["id"])
+                $html .= "<span class='delete' data-id=$post_id>Delete</span>";
+
+            $html .= "<p>From $author_name</p> </br>";
+            $html .= "<p>$content</p>";
+
+            $html .= "<span class='likes_count'> " . count($likes) . " likes  </span>";
+
+            if (in_array($_SESSION["id"], $likes)) {
+                $html .= "<span class='like hide' data-id=$post_id>Like</span>";
+                $html .= "<span class='dislike' data-id=$post_id>Dislike</span>";
+            } else {
+                $html .= "<span class='like' data-id=$post_id>Like</span>";
+                $html .= "<span class='dislike hide' data-id=$post_id>Dislike</span>";
+            }
+
+            $html .= " </div>";
         }
+        if (count($publications) % 5 != 0)
+            $html .= "<p>End of the publications</p>";
     } else {
-        echo "<div class='content'> <p> No publications yet </p> </div>";
+        $html .= "<div class='content'> <p> No publications yet </p> </div>";
     }
+
+    echo $html;
 }

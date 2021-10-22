@@ -1,5 +1,6 @@
 <?php
 include "../backend/functions.php";
+include "../backend/db.php";
 session_start();
 
 // initializing variables
@@ -12,11 +13,6 @@ if (!empty($_SESSION["errors"])) {
     $errors = $_SESSION["errors"];
     unset($_SESSION["errors"]);
 }
-
-// connect to the database
-// root -> password
-// mysql.exe -u root --password
-$db = mysqli_connect('localhost', 'root', 'root', 'hululu');
 
 // REGISTER USER
 if (isset($_POST['reg_user'])) {
@@ -31,6 +27,7 @@ if (isset($_POST['reg_user'])) {
     if (empty($_POST['reg_password_1'])) {
         array_push($errors, "Password is required");
     }
+
     if (!empty($_POST['reg_username']) && !empty($_POST['reg_email']) && !empty($_POST['reg_password_1']) && !empty($_POST['reg_password_2'])) {
         // receive all input values from the form
         $username = mysqli_real_escape_string($db, $_POST['reg_username']);
@@ -38,12 +35,12 @@ if (isset($_POST['reg_user'])) {
         $password_1 = mysqli_real_escape_string($db, $_POST['reg_password_1']);
         $password_2 = mysqli_real_escape_string($db, $_POST['reg_password_2']);
 
-        if ($password_1 != $password_2) {
-            array_push($errors, "The two passwords do not match");
+        if (!preg_match("/^[a-zA-Z0-9-_]*$/",$username)) {
+            array_push($errors, "Invalid username (characters allowed are letters, numbers and '_')");
         }
 
-        if (strpos($username, " ") !== false) {
-            array_push($errors, "Error, space allowed for the username");
+        if ($password_1 != $password_2) {
+            array_push($errors, "The two passwords do not match");
         }
 
         // first check the database to make sure 

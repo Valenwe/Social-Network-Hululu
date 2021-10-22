@@ -4,11 +4,7 @@ session_start();
 $errors = array();
 $success = array();
 
-if (!isset($_SESSION['username'])) {
-    array_push($errors, "You must be logged in first");
-    $_SESSION["errors"] = $errors;
-    header('location: /login');
-}
+check_session_variables();
 
 if (!empty($_SESSION["success"])) {
     $success = $_SESSION["success"];
