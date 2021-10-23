@@ -21,7 +21,7 @@ if (isset($_POST["like"])) {
         $array_likes = explode(" ", $post['likes']);
         if (empty(end($array_likes)))
             unset($array_likes[count($array_likes) - 1]);
-            
+
         $n = count($array_likes);
     } else
         $n = 0;
@@ -53,4 +53,23 @@ if (isset($_POST["dislike"])) {
     mysqli_kill($db, $db_id);
 
     echo $n;
+}
+
+if (isset($_POST["edit"])) {
+    $post_id = $_POST["post_id"];
+    $title = $_POST["title"];
+    $content = $_POST["content"];
+
+    $query = "SELECT * FROM publications WHERE post_id='$post_id'";
+    $result = mysqli_query($db, $query);
+
+    if ($result) {
+        $post = mysqli_fetch_assoc($result);
+        if ($post["id"] == $_SESSION["id"]) {
+            $query = "UPDATE publications SET title='" . $title . "', content ='" . $content . "', modified=1 WHERE post_id = '$post_id'";
+            mysqli_query($db, $query);
+        }
+    }
+    $db_id = mysqli_thread_id($db);
+    mysqli_kill($db, $db_id);
 }

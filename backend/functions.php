@@ -232,7 +232,7 @@ function display_publications($publications)
             $post_id = $post["post_id"];
 
             // id est nécessaire pour localiser le post si on le delete
-            $html .= "<div class='content post' id=$post_id> ";
+            $html .= "<div class='content post' id=$post_id>";
 
             $likes = array();
             if (!empty($post["likes"])) {
@@ -248,13 +248,19 @@ function display_publications($publications)
             $date_time = new DateTime($post['creation_date']);
             $date = $date_time->format('d/m/y H:i');
 
-            $html .= "<h3>$title</h3> <p>$date</p>";
+            $html .= "<h3 class='post_title'>$title</h3>";
 
-            if ($post["id"] == $_SESSION["id"])
-                $html .= "<span class='delete' data-id=$post_id>Delete</span>";
+            if ($post["modified"]) $html .= "<p>Modified</p>";
+
+            $html .= "<p>$date</p>";
+
+            if ($post["id"] == $_SESSION["id"]) {
+                $html .= "<span class='delete' data-id=$post_id>Delete </span>";
+                $html .= "<span class='edit' data-id=$post_id>Edit</span>";
+            }
 
             $html .= "<p>From $author_name</p> </br>";
-            $html .= "<p>$content</p>";
+            $html .= "<p class='post_content'>$content</p>";
 
             $html .= "<span class='likes_count'> " . count($likes) . " likes  </span>";
 
@@ -267,6 +273,25 @@ function display_publications($publications)
             }
 
             $html .= " </div>";
+
+            // partie éditable du post s'il appartient à l'utilisateur
+            if ($post["id"] == $_SESSION["id"]) {
+
+                $html .= "<form method='post' class='edit_post hide' id=$post_id>
+                <div class='input-group'>
+                    <input type='text' name='edit_title' placeholder='Title' value='$title'>
+                </div>
+                <div class='input-group'>
+                    <input type='text' name='edit_content' placeholder='Text' value='$content'>
+                </div>
+                <div class='input-group'>
+                    <button type='button' class='btn edit_cancel'>Cancel</button>
+                </div>
+                <div class='input-group'>
+                    <button type='submit' class='btn' name='edit'>Save</button>
+                </div>
+                </form>";
+            }
         }
         if (count($publications) % 5 != 0)
             $html .= "<p>End of the publications</p>";
@@ -274,5 +299,7 @@ function display_publications($publications)
         $html .= "<div class='content'> <p> No publications yet </p> </div>";
     }
 
+    $count = count($publications);
+    $html .= "<input type='hidden' id='row' value=$count>";
     echo $html;
 }

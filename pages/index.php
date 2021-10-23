@@ -93,7 +93,6 @@ if (!empty($_SESSION["following"])) {
         <?php display_publications($displayed_publications) ?>
     </div>
     
-    <input type="hidden" id="row" value="5">
 
     <script src="../sn/backend/jquery.min.js"></script>
     <script src="../sn/backend/like_system.js"></script>
