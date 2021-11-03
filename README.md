@@ -20,12 +20,36 @@ CREATE TABLE `users` (
   `password` varchar(100) CHARACTER SET latin1 NOT NULL,
   `firstname` varchar(100) CHARACTER SET latin1 DEFAULT NULL,
   `lastname` varchar(100) CHARACTER SET latin1 DEFAULT NULL,
-  `creation_date` date NOT NULL DEFAULT current_timestamp(),
-  `following` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `followers` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `publications` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `creation_date` datetime NOT NULL DEFAULT current_timestamp(),
+  `following` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `follower` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+```
+
+```
+CREATE TABLE `publications` (
+  `post_id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
+  `title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `creation_date` datetime NOT NULL DEFAULT current_timestamp(),
+  `likes` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `modified` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`post_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+```
+
+```
+CREATE TABLE `comments` (
+  `comment_id` int(11) NOT NULL AUTO_INCREMENT,
+  `post_id` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
+  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `likes` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `creation_date` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`comment_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=latin1
 ```
 
 * Then go in its root folder, and create a new directory inside `/htdocs/`, called `sn`
