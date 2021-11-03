@@ -1,11 +1,7 @@
 <?php
 include('../backend/server.php');
 
-if (!isset($_SESSION['username'])) {
-    array_push($errors, "You must be logged in first");
-    $_SESSION["errors"] = $errors;
-    header('location: /login');
-}
+check_session_variables();
 
 if (isset($_GET['showfollowing'])) {
     $_SESSION["showmode"] = "following";
@@ -17,26 +13,16 @@ if (isset($_GET['showfollower'])) {
     header('location: /friends');
 }
 
-if (isset($_GET["delete"])) {
-    $post_id = $_GET["delete"];
-    $query = "DELETE FROM publications WHERE post_id='$post_id'";
-    $result = mysqli_query($db, $query);
-    if ($result) {
-        array_push($success, "Publications deleted successfully");
-    } else {
-        array_push($errors, "Error trying to remove the publications");
-    }
-}
-
 // pour le back button
 if (isset($_SESSION["search"]))
     $last_search = "/search";
 else
     $last_search = "/home";
 
-$publications = get_publication($db, $_SESSION["id"]);
+$publications = get_most_recent_publication(10);
 
 ?>
+
 <!DOCTYPE html>
 <html>
 
@@ -66,6 +52,9 @@ $publications = get_publication($db, $_SESSION["id"]);
     </div>
     <?php display_publications($publications) ?>
     </div>
+
+    <script src="../sn/backend/jquery.min.js"></script>
+    <script src="../sn/backend/publications.js"></script>
 </body>
 
 </html>

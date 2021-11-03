@@ -1,5 +1,6 @@
 <?php
 include "../backend/functions.php";
+include "../backend/db.php";
 session_start();
 
 // initializing variables
@@ -12,11 +13,6 @@ if (!empty($_SESSION["errors"])) {
     $errors = $_SESSION["errors"];
     unset($_SESSION["errors"]);
 }
-
-// connect to the database
-// root -> password
-// mysql.exe -u root --password
-$db = mysqli_connect('localhost', 'root', 'root', 'hululu');
 
 // REGISTER USER
 if (isset($_POST['reg_user'])) {
@@ -31,6 +27,7 @@ if (isset($_POST['reg_user'])) {
     if (empty($_POST['reg_password_1'])) {
         array_push($errors, "Password is required");
     }
+
     if (!empty($_POST['reg_username']) && !empty($_POST['reg_email']) && !empty($_POST['reg_password_1']) && !empty($_POST['reg_password_2'])) {
         // receive all input values from the form
         $username = mysqli_real_escape_string($db, $_POST['reg_username']);
@@ -38,12 +35,12 @@ if (isset($_POST['reg_user'])) {
         $password_1 = mysqli_real_escape_string($db, $_POST['reg_password_1']);
         $password_2 = mysqli_real_escape_string($db, $_POST['reg_password_2']);
 
-        if ($password_1 != $password_2) {
-            array_push($errors, "The two passwords do not match");
+        if (!is_str_valid($username)) {
+            array_push($errors, "Invalid username (characters allowed are letters, numbers and '_')");
         }
 
-        if (strpos($username, " ") !== false) {
-            array_push($errors, "Error, space allowed for the username");
+        if ($password_1 != $password_2) {
+            array_push($errors, "The two passwords do not match");
         }
 
         // first check the database to make sure 
@@ -150,8 +147,8 @@ if (isset($_POST['set_change'])) {
     }
 
     if (!empty($new_username)) {
-        if (strpos($username, " ") !== false) {
-            array_push($errors, "Error, space allowed for the username");
+        if (!is_str_valid($username)) {
+            array_push($errors, "Invalid username (characters allowed are letters, numbers and '_', '-')");
         }
 
         $query = "SELECT * FROM users WHERE username='$new_username'";
@@ -185,17 +182,25 @@ if (isset($_POST['set_change'])) {
     }
 
     if (!empty($new_firstname)) {
-        $query = "UPDATE users SET firstname='" . $new_firstname . "' WHERE id=$id";
-        mysqli_query($db, $query);
-        $_SESSION['firstname'] = $new_firstname;
+        if (!is_str_valid($username)) {
+            array_push($errors, "Invalid name (characters allowed are letters, numbers and '_', '-')");
+        } else {
+            $query = "UPDATE users SET firstname='" . $new_firstname . "' WHERE id=$id";
+            mysqli_query($db, $query);
+            $_SESSION['firstname'] = $new_firstname;
+        }
     }
 
     if (!empty($new_lastname)) {
-        $query = "UPDATE users SET lastname='" . $new_lastname . "' WHERE id=$id";
-        mysqli_query($db, $query);
-        $_SESSION['lastname'] = $new_lastname;
+        if (!is_str_valid($username)) {
+            array_push($errors, "Invalid name (characters allowed are letters, numbers and '_', '-')");
+        } else {
+            $query = "UPDATE users SET lastname='" . $new_lastname . "' WHERE id=$id";
+            mysqli_query($db, $query);
+            $_SESSION['lastname'] = $new_lastname;
+        }
     }
-    
+
     if (count($errors) == 0) {
         array_push($success, "Changes saved successfully");
         $_SESSION["success"] = $success;

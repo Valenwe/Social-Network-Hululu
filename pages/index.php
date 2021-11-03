@@ -1,14 +1,12 @@
 <?php
-include "../backend/functions.php";
 session_start();
+
+include "../backend/functions.php";
+
+check_session_variables();
+
 $errors = array();
 $success = array();
-
-if (!isset($_SESSION['username'])) {
-    array_push($errors, "You must be logged in first");
-    $_SESSION["errors"] = $errors;
-    header('location: /login');
-}
 
 if (!empty($_SESSION["success"])) {
     $success = $_SESSION["success"];
@@ -31,8 +29,12 @@ if (isset($_GET['account']))
 
 
 if (isset($_GET['search'])) {
-    $_SESSION['search'] = $_POST['ind_search_content'];
-    header("location: /search");
+    if (!preg_match("/^[a-zA-Z0-9-_]*$/", $_POST['ind_search_content'])) {
+        array_push($errors, "Incorrect characters");
+    } else {
+        $_SESSION['search'] = $_POST['ind_search_content'];
+        header("location: /search");
+    }
 } else {
     // pour retirer la dernière recherche qui ne sert plus
     if (isset($_SESSION["search"]))
@@ -45,22 +47,10 @@ if (isset($_GET['new_post']))
 
 $displayed_publications = array();
 if (!empty($_SESSION["following"])) {
-    $displayed_publications = get_most_recent_publication(10);
+    $displayed_publications = get_most_recent_publication(5);
 }
-
-if (isset($_GET["delete"])) {
-    $post_id = $_GET["delete"];
-    $query = "DELETE FROM publications WHERE post_id='$post_id'";
-    $result = mysqli_query($db, $query);
-    if ($result) {
-        array_push($success, "Publications deleted successfully");
-    } else {
-        array_push($errors, "Error trying to remove the publications");
-    }
-}
-
-
 ?>
+
 <!DOCTYPE html>
 <html>
 
@@ -99,10 +89,13 @@ if (isset($_GET["delete"])) {
         <?php endif ?>
     </div>
 
-    <div class="content">
+    <div class="content publications">
         <?php display_publications($displayed_publications) ?>
     </div>
+    
 
+    <script src="../sn/backend/jquery.min.js"></script>
+    <script src="../sn/backend/publications.js"></script>
 </body>
 
 </html>
