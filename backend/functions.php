@@ -164,16 +164,15 @@ function post($id, $title, $content)
 }
 
 // récupère les plus récentes publications
-function get_most_recent_publication($limit)
+function get_most_recent_publication($limit, $in_home)
 {
     check_session_variables();
     include "../backend/db.php";
     $following = array();
 
-    if (strpos($_SERVER['REQUEST_URI'], "home")) {
+    if ($in_home) {
         $following = $_SESSION["following"];
     }
-
 
     // on ajoute aussi l'id de la session
     array_push($following, $_SESSION["id"]);
@@ -219,6 +218,89 @@ function get_user($id)
             return null;
     } else
         return null;
+}
+
+function display_comments($post_id, $limit, $hidden)
+{
+    include "../backend/db.php";
+
+    // comment section
+    if ($hidden) {
+        $html = "<span class='show_comments interactable' data-id=$post_id>Show comments</span>";
+        $html .= "<span class='hide hide_comments interactable' data-id=$post_id>Hide comments</span>";
+        $html .= "<div class='comments hide'>";
+    } else {
+        $html = "<span class='show_comments interactable hide' data-id=$post_id>Show comments</span>";
+        $html .= "<span class='hide_comments interactable' data-id=$post_id>Hide comments</span>";
+        $html .= "<div class='comments'>";
+    }
+
+    $html .= "<div data-id='$post_id'> <input class='add_comment_content' placeholder='Comment'>";
+    $html .= "<button type='button' class='add_comment'>Add</button> </div>";
+
+    // on récupère les commentaires
+    $query = "SELECT * FROM comments WHERE post_id='$post_id' ORDER BY creation_date DESC LIMIT $limit";
+    $comments_result = mysqli_query($db, $query);
+
+    if (mysqli_num_rows($comments_result) > 0) {
+        while ($comment = mysqli_fetch_assoc($comments_result)) {
+            $author_id = $comment["id"];
+            $comment_id = $comment["comment_id"];
+
+            // on récupère username
+            $query = "SELECT * FROM users WHERE id='$author_id'";
+            $result = mysqli_query($db, $query);
+            if ($result) {
+                $username = mysqli_fetch_assoc($result)["username"];
+            }
+
+            $content = $comment["content"];
+            $date = $comment["creation_date"];
+
+            $html .= "<div class='comment_section' id=$comment_id>";
+            $html .= "<p class='comment_header'>By $username | $date</p>";
+
+            if ($comment["modified"] == 1) $html .= "<p>Modified</p>";
+
+            if ($comment["id"] == $_SESSION["id"]) {
+                $html .= "<span class='delete_comment interactable' data-id=$comment_id>Delete </span>";
+                $html .= "<span class='edit_comment interactable' data-id=$comment_id>Edit</span>";
+            }
+
+            $html .= "</br><p class='comment_content'>$content</p>";
+            $html .= "</div>";
+
+            // partie éditable du commentaire
+            if ($comment["id"] == $_SESSION["id"]) {
+
+                $html .= "<form method='post' class='edit_comment_form hide' id=$comment_id>
+                <div class='input-group'>
+                    <input type='text' name='edit_content' placeholder='Text' value='$content'>
+                </div>
+                <div class='input-group'>
+                    <button type='button' class='btn edit_comment_cancel'>Cancel</button>
+                </div>
+                <div class='input-group'>
+                    <button type='submit' class='btn' name='edit'>Save</button>
+                </div>
+                </form>";
+            }
+        }
+
+        $count = mysqli_num_rows($comments_result);
+        if ($count % 5 == 0) {
+            $html .= "<span class='interactable show_more_comments'>Show more</span>";
+            $html .= "<input class='comment_counter' type='hidden' id='$post_id' value=$count>";
+        } else
+            $html .= "<p>No more comments available</p>";
+    } else {
+        $html .= "<p>No comments yet</p>";
+    }
+
+    // end comment section
+    $html .= "</div>";
+
+    return $html;
 }
 
 // print une liste de publications données
@@ -273,72 +355,12 @@ function display_publications($publications)
                 $html .= "<span class='dislike interactable hide' data-id=$post_id>Dislike</span>";
             }
 
-            // comment section
-            $html .= "</br> <span class='show_comments interactable' data-id=$post_id>Show comments</span>";
-            $html .= "<span class='hide hide_comments interactable' data-id=$post_id>Hide comments</span>";
-            $html .= "<div class='comments hide'>";
+            // partie commentaires
+            $html .= "<br>" . display_comments($post_id, 5, true);
 
-            $html .= "<div data-id='$post_id'> <input class='add_comment_content' placeholder='Comment'>";
-            $html .= "<button type='button' class='add_comment'>Add</button> </div>";
-
-            // on récupère les commentaires
-            $query = "SELECT * FROM comments WHERE post_id=$post_id ORDER BY creation_date DESC";
-            $comments_result = mysqli_query($db, $query);
-
-            if (mysqli_num_rows($comments_result) > 0) {
-                while ($comment = mysqli_fetch_assoc($comments_result)) {
-                    $author_id = $comment["id"];
-                    $comment_id = $comment["comment_id"];
-
-                    // on récupère username
-                    $query = "SELECT * FROM users WHERE id='$author_id'";
-                    $result = mysqli_query($db, $query);
-                    if ($result) {
-                        $username = mysqli_fetch_assoc($result)["username"];
-                    }
-
-                    $content = $comment["content"];
-                    $likes = $comment["likes"];
-                    $date = $comment["creation_date"];
-
-                    $html .= "<div class='comment_section' id=$comment_id>";
-                    $html .= "<p class='comment_header'>By $username | $date</p>";
-
-                    if ($comment["modified"] == 1) $html .= "<p>Modified</p>";
-
-                    if ($comment["id"] == $_SESSION["id"]) {
-                        $html .= "<span class='delete_comment interactable' data-id=$comment_id>Delete </span>";
-                        $html .= "<span class='edit_comment interactable' data-id=$comment_id>Edit</span>";
-                    }
-
-                    $html .= "</br><p class='comment_content'>$content</p>";
-                    $html .= "</div>";
-
-                    // partie éditable du commentaire
-                    if ($comment["id"] == $_SESSION["id"]) {
-
-                        $html .= "<form method='post' class='edit_comment_form hide' id=$comment_id>
-                        <div class='input-group'>
-                            <input type='text' name='edit_content' placeholder='Text' value='$content'>
-                        </div>
-                        <div class='input-group'>
-                            <button type='button' class='btn edit_comment_cancel'>Cancel</button>
-                        </div>
-                        <div class='input-group'>
-                            <button type='submit' class='btn' name='edit'>Save</button>
-                        </div>
-                        </form>";
-                    }
-                }
-            } else {
-                $html .= "<p>No comments yet</p>";
-            }
-
-            $html .= "</div>";
-            // end comment section
-
-            $html .= " </div>";
             // end post
+            $html .= " </div>";
+
 
             // partie éditable du post s'il appartient à l'utilisateur
             if ($post["id"] == $_SESSION["id"]) {
@@ -366,8 +388,136 @@ function display_publications($publications)
     }
 
     $count = count($publications);
-    $html .= "<input type='hidden' id='row' value=$count>";
+    $html .= "<input type='hidden' class='post_counter' value=$count>";
     echo $html;
+}
+
+// affiche une conversation
+function display_conversation($target_id, $limit, $hidden)
+{
+    include "../backend/db.php";
+    $id = $_SESSION["id"];
+
+    // on récupère tous les pms qui concernent l'id
+    $query = "SELECT * FROM private_messages WHERE (id1=$id AND id2=$target_id) OR (id1=$target_id AND id2=$id) ORDER BY creation_date DESC LIMIT $limit";
+    $results = mysqli_query($db, $query);
+
+    $pms = array();
+    if ($results) {
+        if (mysqli_num_rows($results) > 0) {
+            while ($row = mysqli_fetch_assoc($results)) {
+                $row["content"] = stripslashes($row["content"]);
+                array_push($pms, $row);
+            }
+        }
+    }
+
+    // on reverse pour afficher les messages moins récents en premiers
+    $pms = array_reverse($pms);
+
+    $query = "SELECT username FROM users WHERE id='$target_id'";
+    $target_username = mysqli_fetch_assoc(mysqli_query($db, $query))["username"];
+
+    // title
+    $response = "<div class='content' id=$target_id>";
+    $response .= "<h3>$target_username</h3>";
+
+    if ($hidden) {
+        $response .= "<span class='show_conversation interactable'>Expand</span>";
+        $response .= "<span class='hide_conversation interactable hide'>Hide</span>";
+
+        // messages
+        $response .= "<div class='conversation hide'>";
+    } else {
+        $response .= "<span class='show_conversation interactable hide'>Expand</span>";
+        $response .= "<span class='hide_conversation interactable'>Hide</span>";
+
+        // messages
+        $response .= "<div class='conversation'>";
+    }
+
+
+    $nb_pm = 0;
+    for ($i = 0; $i < count($pms); $i++) {
+        $pm = $pms[$i];
+        if ($pm["id1"] == $id || $pm["id2"] == $id) {
+
+            // partie pour accéder aux messages plus anciens
+            if ($nb_pm == 0 && $limit % 5 == 0) {
+                $response .= "<span class='show_more_messages interactable'>Show more</span>";
+            }
+
+            $nb_pm++;
+            $response .= "<div class='message'>";
+
+            if ($pm["id1"] == $id) {
+                $response .= "<p>You " . $pm["creation_date"] . "</p> <p>" . $pm["content"] . "</p>";
+            } else if ($pm["id2"] == $id) {
+                $response .= "<p>" . $target_username . " " . $pm["creation_date"] . "</p> <p>" . $pm["content"] . "</p>";
+            }
+
+            $response .= "</div>";
+        }
+    }
+
+    if ($nb_pm == 0) {
+        $response .= "<p>No messages yet</p>";
+    } else {
+        $response .= "<input type='hidden' class='message_counter' value=$nb_pm>";
+    }
+
+    $response .= "<input class='new_message_content' placeholder='New message'>";
+    $response .= "<span class='send_message interactable'>Send</span>";
+    $response .= "</div> </div>";
+
+    return $response;
+}
+
+// affiche les onglets des messages privés
+function display_pms($id, $target_id)
+{
+    include "../backend/db.php";
+
+    // on récupère tous les pms qui concernent l'id
+    $query = "SELECT * FROM private_messages WHERE id1=$id OR id2=$id ORDER BY creation_date DESC";
+    $results = mysqli_query($db, $query);
+
+    $pms = array();
+    if ($results) {
+        if (mysqli_num_rows($results) > 0) {
+            while ($row = mysqli_fetch_assoc($results)) {
+                $row["content"] = stripslashes($row["content"]);
+                array_push($pms, $row);
+            }
+        }
+    }
+
+    // on définit tous les onglets de pms à créer
+    $target_pms = array();
+    foreach ($pms as $pm) {
+        if ($pm["id1"] != $id) {
+            if (!in_array($pm["id1"], $target_pms)) array_push($target_pms, $pm["id1"]);
+        }
+
+        if ($pm["id2"] != $id) {
+            if (!in_array($pm["id2"], $target_pms)) array_push($target_pms, $pm["id2"]);
+        }
+    }
+
+    // si on veut créer un nouveau message, on ajoute un onglet
+    if (!in_array($target_id, $target_pms)) array_push($target_pms, $target_id);
+
+    // on reverse pour avoir les plus conversations récentes en premier
+    $target_pms = array_reverse($target_pms);
+
+    $response = "";
+    foreach ($target_pms as $target_id) {
+        $response .= display_conversation($target_id, 5, true);
+    }
+
+    if (count($target_pms) == 0) $response .= "<p>No messages yet</p>";
+
+    return $response;
 }
 
 // detecte si un string n'est pas utilisable pour une query sql

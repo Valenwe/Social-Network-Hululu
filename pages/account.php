@@ -19,7 +19,7 @@ if (isset($_SESSION["search"]))
 else
     $last_search = "/home";
 
-$publications = get_most_recent_publication(10);
+$publications = get_most_recent_publication(10, false);
 
 ?>
 
@@ -50,7 +50,8 @@ $publications = get_most_recent_publication(10);
                             else echo 0 ?></p>
         </a>
     </div>
-    <?php display_publications($publications) ?>
+    <div>
+        <?php display_publications($publications) ?>
     </div>
 
     <script src="../sn/backend/jquery.min.js"></script>

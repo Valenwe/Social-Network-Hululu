@@ -44,10 +44,13 @@ if (isset($_GET['search'])) {
 if (isset($_GET['new_post']))
     header("location: /post");
 
+if (isset($_GET['pm']))
+    header("location: /pm");
+
 
 $displayed_publications = array();
 if (!empty($_SESSION["following"])) {
-    $displayed_publications = get_most_recent_publication(5);
+    $displayed_publications = get_most_recent_publication(5, true);
 }
 ?>
 
@@ -65,6 +68,7 @@ if (!empty($_SESSION["following"])) {
     <div class="header">
         <h2>Home Page</h2>
         <p> <a href="/home?new_post=1" style="color:purple;">New publication</a></p>
+        <p> <a href="/home?pm=1" style="color:gray;">Private messages</a></p>
         <p> <a href="/home?account=1" style="color:green;">Account</a></p>
         <p> <a href="/home?settings='1'" style="color:blue;">Settings</a></p>
         <p> <a href="/home?logout='1'" style="color: red;">Logout</a> </p>

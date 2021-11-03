@@ -1,5 +1,6 @@
 <?php
 include "../backend/db.php";
+include "../backend/functions.php";
 session_start();
 
 if (isset($_POST["delete_post"])) {
@@ -30,7 +31,7 @@ if (isset($_POST["like"])) {
         mysqli_query($db, $query);
 
         $result = mysqli_query($db, "SELECT * FROM publications WHERE post_id=$post_id");
-        $post = mysqli_fetch_array($result);
+        $post = mysqli_fetch_assoc($result);
         if (!empty($post['likes'])) {
             $array_likes = explode(" ", $post['likes']);
             if (empty(end($array_likes)))
@@ -57,7 +58,7 @@ if (isset($_POST["dislike"])) {
         mysqli_query($db, $query);
 
         $result = mysqli_query($db, "SELECT * FROM publications WHERE post_id=$post_id");
-        $post = mysqli_fetch_array($result);
+        $post = mysqli_fetch_assoc($result);
         if (!empty($post['likes'])) {
             $array_likes = explode(" ", $post['likes']);
             if (empty(end($array_likes)))
@@ -74,8 +75,8 @@ if (isset($_POST["dislike"])) {
 if (isset($_POST["edit_post"])) {
     $id = $_SESSION["id"];
     $post_id = $_POST["post_id"];
-    $title = $_POST["title"];
-    $content = $_POST["content"];
+    $title = get_valid_str($_POST["title"]);
+    $content = get_valid_str($_POST["content"]);
 
     $query = "SELECT * FROM publications WHERE post_id='$post_id'";
     $result = mysqli_query($db, $query);
@@ -92,7 +93,7 @@ if (isset($_POST["edit_post"])) {
 if (isset($_POST["add_comment"])) {
     $id = $_SESSION["id"];
     $post_id = $_POST["post_id"];
-    $content = $_POST["content"];
+    $content = get_valid_str($_POST["content"]);
 
     $query = "SELECT * FROM publications WHERE post_id='$post_id'";
     $result = mysqli_query($db, $query);
@@ -111,7 +112,7 @@ if (isset($_POST["add_comment"])) {
 
         // si l'utilisateur est un follower de l'auteur
         if (in_array($id, $followers)) {
-            $query = "INSERT INTO comments (post_id, id, content, likes) VALUES ($post_id, $author_id, '" . $content . "', '')";
+            $query = "INSERT INTO comments (post_id, id, content) VALUES ('$post_id', '$author_id', '" . $content . "')";
             mysqli_query($db, $query);
 
             // on récupère les informations du nouveau commentaire
@@ -171,7 +172,7 @@ if (isset($_POST["delete_comment"])) {
 if (isset($_POST["edit_comment"])) {
     $id = $_SESSION["id"];
     $comment_id = $_POST["comment_id"];
-    $content = $_POST["content"];
+    $content = get_valid_str($_POST["content"]);
 
     $query = "SELECT * FROM comments WHERE comment_id=$comment_id";
     $result = mysqli_query($db, $query);
