@@ -154,7 +154,7 @@ function post($id, $title, $content)
     $title = addslashes($title);
     $content = addslashes($content);
 
-    $query = "INSERT INTO publications (id, title, content, comments, likes) VALUES('$id', '" . $title . "', '" . $content . "', '', '')";
+    $query = "INSERT INTO publications (id, title, content, likes) VALUES('$id', '" . $title . "', '" . $content . "', '')";
     mysqli_query($db, $query);
 
     // get process id
@@ -256,8 +256,8 @@ function display_publications($publications)
             $html .= "<p>$date</p>";
 
             if ($post["id"] == $_SESSION["id"]) {
-                $html .= "<span class='delete interactable' data-id=$post_id>Delete </span>";
-                $html .= "<span class='edit interactable' data-id=$post_id>Edit</span>";
+                $html .= "<span class='delete_post interactable' data-id=$post_id>Delete </span>";
+                $html .= "<span class='edit_post interactable' data-id=$post_id>Edit</span>";
             }
 
             $html .= "<p>From $author_name</p> </br>";
@@ -274,8 +274,8 @@ function display_publications($publications)
             }
 
             // comment section
-            $html .= "</br> <span class='show_comments interactable' data-id=$post_id>Show comment</span>";
-            $html .= "<span class='hide hide_comments interactable' data-id=$post_id>Hide comment</span>";
+            $html .= "</br> <span class='show_comments interactable' data-id=$post_id>Show comments</span>";
+            $html .= "<span class='hide hide_comments interactable' data-id=$post_id>Hide comments</span>";
             $html .= "<div class='comments hide'>";
 
             $html .= "<div data-id='$post_id'> <input class='add_comment_content' placeholder='Comment'>";
@@ -302,8 +302,33 @@ function display_publications($publications)
                     $date = $comment["creation_date"];
 
                     $html .= "<div class='comment_section' id=$comment_id>";
-                    $html .= "<p>By $username | $date</br>$content</p>";
+                    $html .= "<p class='comment_header'>By $username | $date</p>";
+
+                    if ($comment["modified"] == 1) $html .= "<p>Modified</p>";
+
+                    if ($comment["id"] == $_SESSION["id"]) {
+                        $html .= "<span class='delete_comment interactable' data-id=$comment_id>Delete </span>";
+                        $html .= "<span class='edit_comment interactable' data-id=$comment_id>Edit</span>";
+                    }
+
+                    $html .= "</br><p class='comment_content'>$content</p>";
                     $html .= "</div>";
+
+                    // partie éditable du commentaire
+                    if ($comment["id"] == $_SESSION["id"]) {
+
+                        $html .= "<form method='post' class='edit_comment_form hide' id=$comment_id>
+                        <div class='input-group'>
+                            <input type='text' name='edit_content' placeholder='Text' value='$content'>
+                        </div>
+                        <div class='input-group'>
+                            <button type='button' class='btn edit_comment_cancel'>Cancel</button>
+                        </div>
+                        <div class='input-group'>
+                            <button type='submit' class='btn' name='edit'>Save</button>
+                        </div>
+                        </form>";
+                    }
                 }
             } else {
                 $html .= "<p>No comments yet</p>";
@@ -318,7 +343,7 @@ function display_publications($publications)
             // partie éditable du post s'il appartient à l'utilisateur
             if ($post["id"] == $_SESSION["id"]) {
 
-                $html .= "<form method='post' class='edit_post hide interactable' id=$post_id>
+                $html .= "<form method='post' class='edit_post_form hide' id=$post_id>
                 <div class='input-group'>
                     <input type='text' name='edit_title' placeholder='Title' value='$title'>
                 </div>
@@ -326,7 +351,7 @@ function display_publications($publications)
                     <input type='text' name='edit_content' placeholder='Text' value='$content'>
                 </div>
                 <div class='input-group'>
-                    <button type='button' class='btn edit_cancel'>Cancel</button>
+                    <button type='button' class='btn edit_post_cancel'>Cancel</button>
                 </div>
                 <div class='input-group'>
                     <button type='submit' class='btn' name='edit'>Save</button>
