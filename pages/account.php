@@ -54,7 +54,7 @@ $publications = get_most_recent_publication(10);
     </div>
 
     <script src="../sn/backend/jquery.min.js"></script>
-    <script src="../sn/backend/like_system.js"></script>
+    <script src="../sn/backend/publications.js"></script>
 </body>
 
 </html>

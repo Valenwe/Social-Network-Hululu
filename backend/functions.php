@@ -224,6 +224,7 @@ function get_user($id)
 // print une liste de publications données
 function display_publications($publications)
 {
+    include "../backend/db.php";
     $html = "";
     if ($publications != null && count($publications) > 0) {
         foreach ($publications as $post) {
@@ -255,8 +256,8 @@ function display_publications($publications)
             $html .= "<p>$date</p>";
 
             if ($post["id"] == $_SESSION["id"]) {
-                $html .= "<span class='delete' data-id=$post_id>Delete </span>";
-                $html .= "<span class='edit' data-id=$post_id>Edit</span>";
+                $html .= "<span class='delete interactable' data-id=$post_id>Delete </span>";
+                $html .= "<span class='edit interactable' data-id=$post_id>Edit</span>";
             }
 
             $html .= "<p>From $author_name</p> </br>";
@@ -265,19 +266,59 @@ function display_publications($publications)
             $html .= "<span class='likes_count'> " . count($likes) . " likes  </span>";
 
             if (in_array($_SESSION["id"], $likes)) {
-                $html .= "<span class='like hide' data-id=$post_id>Like</span>";
-                $html .= "<span class='dislike' data-id=$post_id>Dislike</span>";
+                $html .= "<span class='like interactable hide' data-id=$post_id>Like</span>";
+                $html .= "<span class='dislike interactable' data-id=$post_id>Dislike</span>";
             } else {
-                $html .= "<span class='like' data-id=$post_id>Like</span>";
-                $html .= "<span class='dislike hide' data-id=$post_id>Dislike</span>";
+                $html .= "<span class='like interactable' data-id=$post_id>Like</span>";
+                $html .= "<span class='dislike interactable hide' data-id=$post_id>Dislike</span>";
             }
 
+            // comment section
+            $html .= "</br> <span class='show_comments interactable' data-id=$post_id>Show comment</span>";
+            $html .= "<span class='hide hide_comments interactable' data-id=$post_id>Hide comment</span>";
+            $html .= "<div class='comments hide'>";
+
+            $html .= "<div data-id='$post_id'> <input class='add_comment_content' placeholder='Comment'>";
+            $html .= "<button type='button' class='add_comment'>Add</button> </div>";
+
+            // on récupère les commentaires
+            $query = "SELECT * FROM comments WHERE post_id=$post_id ORDER BY creation_date DESC";
+            $comments_result = mysqli_query($db, $query);
+
+            if (mysqli_num_rows($comments_result) > 0) {
+                while ($comment = mysqli_fetch_assoc($comments_result)) {
+                    $author_id = $comment["id"];
+                    $comment_id = $comment["comment_id"];
+
+                    // on récupère username
+                    $query = "SELECT * FROM users WHERE id='$author_id'";
+                    $result = mysqli_query($db, $query);
+                    if ($result) {
+                        $username = mysqli_fetch_assoc($result)["username"];
+                    }
+
+                    $content = $comment["content"];
+                    $likes = $comment["likes"];
+                    $date = $comment["creation_date"];
+
+                    $html .= "<div class='comment_section' id=$comment_id>";
+                    $html .= "<p>By $username | $date</br>$content</p>";
+                    $html .= "</div>";
+                }
+            } else {
+                $html .= "<p>No comments yet</p>";
+            }
+
+            $html .= "</div>";
+            // end comment section
+
             $html .= " </div>";
+            // end post
 
             // partie éditable du post s'il appartient à l'utilisateur
             if ($post["id"] == $_SESSION["id"]) {
 
-                $html .= "<form method='post' class='edit_post hide' id=$post_id>
+                $html .= "<form method='post' class='edit_post hide interactable' id=$post_id>
                 <div class='input-group'>
                     <input type='text' name='edit_title' placeholder='Title' value='$title'>
                 </div>
@@ -302,4 +343,16 @@ function display_publications($publications)
     $count = count($publications);
     $html .= "<input type='hidden' id='row' value=$count>";
     echo $html;
+}
+
+// detecte si un string n'est pas utilisable pour une query sql
+function is_str_valid($str)
+{
+    return preg_match("/^[a-zA-Z0-9-_-]*$/", $str);
+}
+
+// transforme un string en un string valide pour une requête sql
+function get_valid_str($str)
+{
+    return preg_replace("~[^a-zA-Z0-9-_:]~i", "", $str);
 }

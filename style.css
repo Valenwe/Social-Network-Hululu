@@ -9,7 +9,7 @@ body {
 }
 
 .header {
-   width: 30%;
+   width: 60%;
    margin: 50px auto 0px;
    color: white;
    background: #5f9ea0;
@@ -22,7 +22,7 @@ body {
 
 form,
 .content {
-   width: 30%;
+   width: 60%;
    margin: 0px auto;
    padding: 20px;
    border: 1px solid #b0c4de;
@@ -76,8 +76,7 @@ form,
    margin-bottom: 20px;
 }
 
-.like,
-.dislike, .delete, .edit {
+.interactable {
    cursor: pointer;
    color: blue;
 }

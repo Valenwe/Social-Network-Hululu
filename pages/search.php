@@ -10,6 +10,9 @@ if (!isset($_SESSION['username'])) {
 foreach ($_GET as $key => $value) {
     if (strpos($value, "user_") !== false) {
         $_SESSION['target_search'] = str_replace_first("user_", "", $value);
+
+        // au cas où de mauvais caractères sont présents
+        $_SESSION['target_search'] = get_valid_str($_SESSION['target_search']);
         // si on clique sur notre compte
         if ($_SESSION["username"] == $_SESSION["target_search"]) {
             header("location: /me");

@@ -35,7 +35,7 @@ if (isset($_POST['reg_user'])) {
         $password_1 = mysqli_real_escape_string($db, $_POST['reg_password_1']);
         $password_2 = mysqli_real_escape_string($db, $_POST['reg_password_2']);
 
-        if (!preg_match("/^[a-zA-Z0-9-_]*$/",$username)) {
+        if (!is_str_valid($username)) {
             array_push($errors, "Invalid username (characters allowed are letters, numbers and '_')");
         }
 
@@ -147,8 +147,8 @@ if (isset($_POST['set_change'])) {
     }
 
     if (!empty($new_username)) {
-        if (strpos($username, " ") !== false) {
-            array_push($errors, "Error, space allowed for the username");
+        if (!is_str_valid($username)) {
+            array_push($errors, "Invalid username (characters allowed are letters, numbers and '_', '-')");
         }
 
         $query = "SELECT * FROM users WHERE username='$new_username'";
@@ -182,17 +182,25 @@ if (isset($_POST['set_change'])) {
     }
 
     if (!empty($new_firstname)) {
-        $query = "UPDATE users SET firstname='" . $new_firstname . "' WHERE id=$id";
-        mysqli_query($db, $query);
-        $_SESSION['firstname'] = $new_firstname;
+        if (!is_str_valid($username)) {
+            array_push($errors, "Invalid name (characters allowed are letters, numbers and '_', '-')");
+        } else {
+            $query = "UPDATE users SET firstname='" . $new_firstname . "' WHERE id=$id";
+            mysqli_query($db, $query);
+            $_SESSION['firstname'] = $new_firstname;
+        }
     }
 
     if (!empty($new_lastname)) {
-        $query = "UPDATE users SET lastname='" . $new_lastname . "' WHERE id=$id";
-        mysqli_query($db, $query);
-        $_SESSION['lastname'] = $new_lastname;
+        if (!is_str_valid($username)) {
+            array_push($errors, "Invalid name (characters allowed are letters, numbers and '_', '-')");
+        } else {
+            $query = "UPDATE users SET lastname='" . $new_lastname . "' WHERE id=$id";
+            mysqli_query($db, $query);
+            $_SESSION['lastname'] = $new_lastname;
+        }
     }
-    
+
     if (count($errors) == 0) {
         array_push($success, "Changes saved successfully");
         $_SESSION["success"] = $success;

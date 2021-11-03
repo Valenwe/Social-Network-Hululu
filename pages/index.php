@@ -95,7 +95,7 @@ if (!empty($_SESSION["following"])) {
     
 
     <script src="../sn/backend/jquery.min.js"></script>
-    <script src="../sn/backend/like_system.js"></script>
+    <script src="../sn/backend/publications.js"></script>
 </body>
 
 </html>

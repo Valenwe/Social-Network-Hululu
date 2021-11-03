@@ -9,6 +9,7 @@ $(document).ready(function () {
          type: "post",
          data: {
             like: 1,
+
             post_id: post_id
          },
          success: function (response) {
@@ -17,7 +18,7 @@ $(document).ready(function () {
                .find("span.likes_count")
                .text(response + " likes  ");
             $post.addClass("hide");
-            $post.siblings().removeClass("hide");
+            $post.parent().find(".dislike").removeClass("hide");
          }
       });
    });
@@ -32,6 +33,7 @@ $(document).ready(function () {
          type: "post",
          data: {
             dislike: 1,
+
             post_id: post_id
          },
          success: function (response) {
@@ -40,7 +42,7 @@ $(document).ready(function () {
                .find("span.likes_count")
                .text(response + " likes  ");
             $post.addClass("hide");
-            $post.siblings().removeClass("hide");
+            $post.parent().find(".like").removeClass("hide");
          }
       });
    });
@@ -56,6 +58,7 @@ $(document).ready(function () {
          type: "post",
          data: {
             delete: 1,
+
             post_id: post_id
          },
          success: function () {
@@ -156,5 +159,40 @@ $(document).ready(function () {
             }
          });
       }
+   });
+
+   $("body").delegate(".show_comments", "click", function () {
+      let comments = $(this).parent().find(".comments");
+      comments.removeClass("hide");
+      $(this).addClass("hide");
+      $(this).parent().find(".hide_comments").removeClass("hide");
+   });
+
+   $("body").delegate(".hide_comments", "click", function () {
+      let comments = $(this).parent().find(".comments");
+      comments.addClass("hide");
+      $(this).addClass("hide");
+      $(this).parent().find(".show_comments").removeClass("hide");
+   });
+
+   $("body").delegate(".add_comment", "click", function () {
+      let post_id = $(this).parent().data("id");
+      let content_element = $(this).parent().find(".add_comment_content");
+      let content = content_element.val();
+
+      $.ajax({
+         url: "../sn/backend/publication_handle.php",
+         type: "post",
+         data: { add_comment: 1, post_id: post_id, content: content },
+         success: function (response) {
+            alert(response);
+            $(this).parent().append(response);
+            content_element.val("");
+            
+
+            /*if ($(this).next("p").text() == "No comments yet")
+               $(this).next("p").remove();*/
+         }
+      });
    });
 });
