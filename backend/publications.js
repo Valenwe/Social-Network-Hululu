@@ -47,7 +47,8 @@ $(document).ready(function () {
       });
    });
 
-   $("body").delegate(".delete", "click", function () {
+   // user deletes a post
+   $("body").delegate(".delete_post", "click", function () {
       let confirmation = confirm("Are you sure you want to delete that post?");
       if (!confirmation) return;
       let post_id = $(this).data("id");
@@ -57,8 +58,7 @@ $(document).ready(function () {
          url: "../sn/backend/publication_handle.php",
          type: "post",
          data: {
-            delete: 1,
-
+            delete_post: 1,
             post_id: post_id
          },
          success: function () {
@@ -70,7 +70,7 @@ $(document).ready(function () {
    });
 
    // active un edit d'un post
-   $("body").delegate(".edit", "click", function () {
+   $("body").delegate(".edit_post", "click", function () {
       let button = $(this);
       button.parent().addClass("hide");
 
@@ -78,12 +78,12 @@ $(document).ready(function () {
       let edit_form = button
          .parent()
          .parent()
-         .find("form.edit_post#" + post_id);
+         .find("form.edit_post_form#" + post_id);
       edit_form.removeClass("hide");
    });
 
    // cancel un edit
-   $("body").delegate(".edit_cancel", "click", function () {
+   $("body").delegate(".edit_post_cancel", "click", function () {
       let edit_form = $(this).parent().parent();
       let post_id = edit_form.attr("id");
 
@@ -94,7 +94,7 @@ $(document).ready(function () {
    });
 
    // sauvegarde un edit
-   $("body").delegate(".edit_post", "submit", function () {
+   $("body").delegate(".edit_post_form", "submit", function () {
       let form = $(this);
 
       let post_id = form.attr("id");
@@ -117,7 +117,7 @@ $(document).ready(function () {
       $.ajax({
          url: "../sn/backend/publication_handle.php",
          type: "post",
-         data: { edit: 1, post_id: post_id, title: title, content: content },
+         data: { edit_post: 1, post_id: post_id, title: title, content: content },
          success: function () {
             form.addClass("hide");
             post.removeClass("hide");
@@ -161,6 +161,7 @@ $(document).ready(function () {
       }
    });
 
+   // affiche les commentaires d'un post
    $("body").delegate(".show_comments", "click", function () {
       let comments = $(this).parent().find(".comments");
       comments.removeClass("hide");
@@ -168,6 +169,7 @@ $(document).ready(function () {
       $(this).parent().find(".hide_comments").removeClass("hide");
    });
 
+   // cache les commentaires d'un post
    $("body").delegate(".hide_comments", "click", function () {
       let comments = $(this).parent().find(".comments");
       comments.addClass("hide");
@@ -175,9 +177,11 @@ $(document).ready(function () {
       $(this).parent().find(".show_comments").removeClass("hide");
    });
 
+   // ajoute un commentaire
    $("body").delegate(".add_comment", "click", function () {
-      let post_id = $(this).parent().data("id");
-      let content_element = $(this).parent().find(".add_comment_content");
+      let post = $(this).parent();
+      let post_id = post.data("id");
+      let content_element = post.find(".add_comment_content");
       let content = content_element.val();
 
       $.ajax({
@@ -185,14 +189,95 @@ $(document).ready(function () {
          type: "post",
          data: { add_comment: 1, post_id: post_id, content: content },
          success: function (response) {
-            alert(response);
-            $(this).parent().append(response);
-            content_element.val("");
-            
+            if (post.next("p").text() == "No comments yet") post.next("p").remove();
 
-            /*if ($(this).next("p").text() == "No comments yet")
-               $(this).next("p").remove();*/
+            content_element.parent().after(response);
+            content_element.val("");
          }
       });
    });
+
+   // supprime un commentaire
+   $("body").delegate(".delete_comment", "click", function () {
+      let confirmation = confirm("Are you sure you want to delete that comment?");
+      if (!confirmation) return;
+      let comment_id = $(this).data("id");
+      $comment = $(this);
+
+      $.ajax({
+         url: "../sn/backend/publication_handle.php",
+         type: "post",
+         data: {
+            delete_comment: 1,
+            comment_id: comment_id
+         },
+         success: function () {
+            comment = document.getElementById(comment_id);
+            // supprime l'élément
+            comment.parentNode.removeChild(comment);
+         }
+      });
+   });
+
+   // active un edit d'un commentaire
+   $("body").delegate(".edit_comment", "click", function () {
+      let button = $(this);
+      button.parent().addClass("hide");
+
+      let comment_id = button.data("id");
+      let edit_form = button
+         .parent()
+         .parent()
+         .find("form.edit_comment_form#" + comment_id);
+      edit_form.removeClass("hide");
+   });
+
+   // cancel un edit de commentaire
+   $("body").delegate(".edit_comment_cancel", "click", function () {
+      let edit_form = $(this).parent().parent();
+      let comment_id = edit_form.attr("id");
+
+      edit_form.addClass("hide");
+      let comment = edit_form.parent().find("div.comment_section#" + comment_id);
+
+      comment.removeClass("hide");
+   });
+
+   // sauvegarde un edit de commentaire
+   $("body").delegate(".edit_comment_form", "submit", function () {
+      let form = $(this);
+
+      let comment_id = form.attr("id");
+      let content;
+
+      let comment = form.parent().find("div.comment_section#" + comment_id);
+
+      form.find("input").each(function () {
+         if ($(this).attr("name") == "edit_content") content = $(this).val();
+      });
+
+      // si aucun changement
+      if (comment.find(".comment_content").text() == content) {
+         form.addClass("hide");
+         comment.removeClass("hide");
+         return false;
+      }
+
+      $.ajax({
+         url: "../sn/backend/publication_handle.php",
+         type: "post",
+         data: { edit_comment: 1, comment_id: comment_id, content: content },
+         success: function () {
+            form.addClass("hide");
+            comment.removeClass("hide");
+            comment.find(".comment_content").text(content);
+
+            if (comment.find(".comment_header").next("p").text() != "Modified") comment.find(".comment_header").after("<p>Modified</p>");
+         }
+      });
+
+      // désactive le refresh de la page
+      return false;
+   });
+
 });
