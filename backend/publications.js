@@ -139,22 +139,20 @@ $(document).ready(function () {
       var bottom = $(document).height() - $(window).height();
 
       if (position == bottom) {
-         var row = Number($("#row").val());
+         var counter = $(".post_counter");
+         var row = Number($(".post_counter").val());
          var rowperpage = 5;
          // si on a atteint la fin des publications
          if (row % rowperpage != 0) return;
          row = row + rowperpage;
+         counter.val(row);
 
          $.ajax({
             url: "../sn/backend/function_caller.php",
             type: "post",
             data: { row: row, function: "get_and_display_publications" },
             success: function (response) {
-               // alert(response);
-               $("div.publications")
-                  .after("<div class='content publications'>" + response + "</div>")
-                  .show()
-                  .fadeIn("slow");
+               $("div.publications").after("<div class='content publications'>" + response + "</div>");
                $("div.publications:first").remove();
             }
          });
@@ -280,4 +278,37 @@ $(document).ready(function () {
       return false;
    });
 
+   // affiche de nouveaux commentaires si click
+   $("body").delegate(".show_more_comments", "click", function () {
+      var counter = $(this).parent().find(".comment_counter");
+      var post_id = $(this).parent().parent().attr("id");
+
+      var comments = $(this).parent().parent().find(".comments");
+      var show_span = $(this).parent().parent().find(".show_comments");
+      var hide_span = $(this).parent().parent().find(".hide_comments");
+
+      var row = Number(counter.val());
+      var rowperpage = 5;
+
+      if (row % rowperpage == 0) {
+         row = row + rowperpage;
+         counter.val(row);
+
+         $.ajax({
+            url: "../sn/backend/function_caller.php",
+            type: "post",
+            data: { row: row, post_id: post_id, function: "get_and_display_comments" },
+            success: function (response) {
+               show_span.remove();
+               hide_span.remove();
+
+               comments.after(response);
+               comments.remove();
+            }
+         });
+      } else {
+         $(this).text("No more comments available");
+         $(this).removeClass("interactable");
+      }
+   });
 });

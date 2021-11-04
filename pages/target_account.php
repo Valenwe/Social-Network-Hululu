@@ -34,6 +34,11 @@ if (isset($_GET["unfriend"])) {
     }
 }
 
+if (isset($_GET["send_pm"])) {
+    header("location: /pm");
+}
+
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -54,9 +59,10 @@ if (isset($_GET["unfriend"])) {
         <p><a class="btn" href="/search">Back</a></p>
         <?php if (isset($target)) : ?>
             <?php if (!is_following($target["id"])) : ?>
-                <p><a href=<?php echo $_SERVER["REQUEST_URI"] . "?friend=1" ?>>Add friend</a></p>
+                <p><a href=<?php echo strtok($_SERVER["REQUEST_URI"], "?") . "?friend=1" ?>>Add friend</a></p>
             <?php else : ?>
-                <p><a href=<?php echo $_SERVER["REQUEST_URI"] . "?unfriend=1" ?>>Remove friend</a></p>
+                <p><a href=<?php echo strtok($_SERVER["REQUEST_URI"], "?")  . "?unfriend=1" ?>>Remove friend</a></p>
+                <p><a href=<?php echo strtok($_SERVER["REQUEST_URI"], "?")  . "?send_pm=1" ?>>Send message</a></p>
             <?php endif ?>
 
             <p>Name: <?php if (!empty($target['firstname']) && !empty($target['lastname'])) echo $target['firstname'] . " " . $target['lastname']; ?></p>

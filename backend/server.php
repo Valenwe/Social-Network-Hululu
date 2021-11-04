@@ -45,7 +45,7 @@ if (isset($_POST['reg_user'])) {
 
         // first check the database to make sure 
         // a user does not already exist with the same username and/or email
-        $user_check_query = "SELECT * FROM users WHERE username=$username OR email=$email";
+        $user_check_query = "SELECT username, email FROM users WHERE username=$username OR email=$email";
         $result = mysqli_query($db, $user_check_query);
         if (!empty($result)) {
             $user = mysqli_fetch_assoc($result);
@@ -132,7 +132,7 @@ if (isset($_POST['set_change'])) {
         }
 
         $new_password = password_hash($new_password, PASSWORD_BCRYPT);
-        $query = "SELECT * FROM users WHERE username='$username'";
+        $query = "SELECT password FROM users WHERE username='$username'";
         $result = mysqli_query($db, $query);
         $user = mysqli_fetch_assoc($result);
 
@@ -151,7 +151,7 @@ if (isset($_POST['set_change'])) {
             array_push($errors, "Invalid username (characters allowed are letters, numbers and '_', '-')");
         }
 
-        $query = "SELECT * FROM users WHERE username='$new_username'";
+        $query = "SELECT username FROM users WHERE username='$new_username'";
         $result = mysqli_query($db, $query);
         $user = mysqli_fetch_assoc($result);
 
@@ -167,7 +167,7 @@ if (isset($_POST['set_change'])) {
     }
 
     if (!empty($new_email)) {
-        $query = "SELECT * FROM users WHERE email='$new_email'";
+        $query = "SELECT username FROM users WHERE email='$new_email'";
         $result = mysqli_query($db, $query);
         $user = mysqli_fetch_assoc($result);
 

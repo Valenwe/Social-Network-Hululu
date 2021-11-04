@@ -10,7 +10,8 @@ $rules = array(
     "settings" => "settings",
     "target_account" => "user=",
     "user_list" => "friends",
-    "post" => "post"
+    "post" => "post",
+    "private_messages" => "pm"
 );
 
 $uri = rtrim(dirname($_SERVER["SCRIPT_NAME"]), '/');
