@@ -11,7 +11,11 @@
 ## How to install the project:
 
 * You first need to install XAMPP, 
-* Then go to the Admin page of MySQL (`localhost/phpmyadmin/`), and create a new database names `registration` and a new table with that SQL request:
+* Then go to the Admin page of MySQL (`localhost/phpmyadmin/`), and execute those SQL requests:
+```
+CREATE DATABASE `hululu`;
+```
+And inside that new database, these aswell:
 ```
 CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -24,10 +28,8 @@ CREATE TABLE `users` (
   `following` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `follower` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-```
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-```
 CREATE TABLE `publications` (
   `post_id` int(11) NOT NULL AUTO_INCREMENT,
   `id` int(11) NOT NULL,
@@ -37,19 +39,17 @@ CREATE TABLE `publications` (
   `likes` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `modified` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`post_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-```
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-```
 CREATE TABLE `comments` (
   `comment_id` int(11) NOT NULL AUTO_INCREMENT,
   `post_id` int(11) NOT NULL,
   `id` int(11) NOT NULL,
-  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `likes` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `modified` int(11) NOT NULL DEFAULT 0,
   `creation_date` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`comment_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 * Then go in its root folder, and create a new directory inside `/htdocs/`, called `sn`
