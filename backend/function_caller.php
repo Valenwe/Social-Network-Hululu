@@ -16,7 +16,7 @@ if (!empty($_POST['function'])) {
             break;
 
         case "get_and_display_messages":
-            echo display_conversation($_POST["target_id"], $_POST["row"], false);
+            echo display_conversation($_POST["target_id"], $_POST["row"], $_POST["hidden"]);
             break;
     }
 

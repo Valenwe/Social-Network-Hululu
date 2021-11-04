@@ -75,8 +75,8 @@ if (isset($_POST["dislike"])) {
 if (isset($_POST["edit_post"])) {
     $id = $_SESSION["id"];
     $post_id = $_POST["post_id"];
-    $title = get_valid_str($_POST["title"]);
-    $content = get_valid_str($_POST["content"]);
+    $title = addslashes($_POST["title"]);
+    $content = addslashes($_POST["content"]);
 
     $query = "SELECT * FROM publications WHERE post_id='$post_id'";
     $result = mysqli_query($db, $query);
@@ -93,7 +93,7 @@ if (isset($_POST["edit_post"])) {
 if (isset($_POST["add_comment"])) {
     $id = $_SESSION["id"];
     $post_id = $_POST["post_id"];
-    $content = get_valid_str($_POST["content"]);
+    $content = addslashes($_POST["content"]);
 
     $query = "SELECT * FROM publications WHERE post_id='$post_id'";
     $result = mysqli_query($db, $query);
@@ -172,7 +172,7 @@ if (isset($_POST["delete_comment"])) {
 if (isset($_POST["edit_comment"])) {
     $id = $_SESSION["id"];
     $comment_id = $_POST["comment_id"];
-    $content = get_valid_str($_POST["content"]);
+    $content = addslashes($_POST["content"]);
 
     $query = "SELECT * FROM comments WHERE comment_id=$comment_id";
     $result = mysqli_query($db, $query);

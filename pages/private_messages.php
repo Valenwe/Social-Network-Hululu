@@ -7,7 +7,7 @@ $new_pm_target = -1;
 if (isset($_SESSION['target_search'])) {
     $query = "SELECT id FROM users WHERE username='" . $_SESSION["target_search"] . "'";
     $new_pm_target = mysqli_fetch_assoc(mysqli_query($db, $query))["id"];
-    //unset($_SESSION["target_search"]);
+    unset($_SESSION["target_search"]);
 }
 
 ?>

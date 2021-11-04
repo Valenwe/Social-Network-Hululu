@@ -81,7 +81,7 @@ function add_follow($db, $friend)
     if (!is_following($friend_id)) {
         // on change le user target
         if (!empty($friend["follower"])) {
-            $new_follower = $friend["follower"];
+            $new_follower = explode(" ", $friend["follower"]);
         }
         array_push($new_follower, $_SESSION["id"]);
         $str_new_follower = implode(" ", $new_follower);
@@ -109,11 +109,13 @@ function remove_follow($db, $friend)
         $new_following = $_SESSION["following"];
     }
     $friend_id = $friend["id"];
-    if (!is_following($friend_id)) {
+    
+    if (is_following($friend_id)) {
         // on change le user target
         if (!empty($friend["follower"])) {
-            $new_follower = $friend["follower"];
+            $new_follower = explode(" ", $friend["follower"]);
         }
+        
         unset($new_follower[array_search($_SESSION["id"], $new_follower)]);
         $str_new_follower = implode(" ", $new_follower);
         $query = "UPDATE users SET follower = '$str_new_follower' WHERE id='$friend_id'";
@@ -254,7 +256,7 @@ function display_comments($post_id, $limit, $hidden)
                 $username = mysqli_fetch_assoc($result)["username"];
             }
 
-            $content = $comment["content"];
+            $content = stripslashes($comment["content"]);
             $date = $comment["creation_date"];
 
             $html .= "<div class='comment_section' id=$comment_id>";
@@ -310,8 +312,8 @@ function display_publications($publications)
     $html = "";
     if ($publications != null && count($publications) > 0) {
         foreach ($publications as $post) {
-            $title = $post["title"];
-            $content = $post["content"];
+            $title = stripslashes($post["title"]);
+            $content = stripslashes($post["content"]);
             $post_id = $post["post_id"];
 
             // id est nécessaire pour localiser le post si on le delete
@@ -505,14 +507,14 @@ function display_pms($id, $target_id)
     }
 
     // si on veut créer un nouveau message, on ajoute un onglet
-    if (!in_array($target_id, $target_pms)) array_push($target_pms, $target_id);
+    if (!in_array($target_id, $target_pms) && $target_id != -1) array_push($target_pms, $target_id);
 
     // on reverse pour avoir les plus conversations récentes en premier
     $target_pms = array_reverse($target_pms);
 
     $response = "";
     foreach ($target_pms as $target_id) {
-        $response .= display_conversation($target_id, 5, true);
+        $response .= display_conversation($target_id, 5, 1);
     }
 
     if (count($target_pms) == 0) $response .= "<p>No messages yet</p>";

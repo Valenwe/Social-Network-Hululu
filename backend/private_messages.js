@@ -18,12 +18,13 @@ $(document).ready(function () {
    $("body").delegate(".send_message", "click", function () {
       conversation = $(this).parent();
       input = conversation.find(".new_message_content");
+      target_id = conversation.parent().attr("id");
       content = input.val();
-
+      
       $.ajax({
          url: "../sn/backend/private_message_handle.php",
          type: "post",
-         data: { send_message: 1, target_id: conversation.parent().attr("id"), content: content },
+         data: { send_message: 1, target_id: target_id, content: content },
          success: function (response) {
             input.val("");
             input.before(response);
@@ -47,7 +48,7 @@ $(document).ready(function () {
          $.ajax({
             url: "../sn/backend/function_caller.php",
             type: "post",
-            data: { row: row, target_id: target_id, function: "get_and_display_messages" },
+            data: { row: row, target_id: target_id, hidden: 0, function: "get_and_display_messages" },
             success: function (response) {
                content.after(response);
                content.remove();
@@ -58,4 +59,23 @@ $(document).ready(function () {
          $(this).removeClass("interactable");
       }
    });
+
+   // check toutes les 3 secondes s'il y a de nouveaux messages
+   window.setTimeout(function () {
+      $(".content:first").find(".content").each(function() {
+         target_id = $(this).attr("id");
+         counter = $(this).find(".message_counter");
+         hidden = Number($(this).find(".conversation").hasClass("hide"));
+         
+         $.ajax({
+            url: "../sn/backend/function_caller.php",
+            type: "post",
+            data: { row: counter.val(), target_id: target_id, hidden: hidden, function: "get_and_display_messages" },
+            success: function (response) {
+               $(this).after(response);
+               $(this).remove();
+            }
+         });
+      });
+   }, 3000);
 });
