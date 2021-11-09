@@ -57,6 +57,7 @@ if (isset($_GET["send_pm"])) {
     <div class="content">
         <?php include "../backend/popup.php" ?>
         <p><a class="btn" href="/search">Back</a></p>
+        <img class='avatar' src= '<?php echo $target['avatar']; ?>'>
         <?php if (isset($target)) : ?>
             <?php if (!is_following($target["id"])) : ?>
                 <p><a href=<?php echo strtok($_SERVER["REQUEST_URI"], "?") . "?friend=1" ?>>Add friend</a></p>

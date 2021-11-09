@@ -220,3 +220,59 @@ if (isset($_POST['set_reset_name'])) {
 
     array_push($success, "Name reset");
 }
+
+// UPLOAD AVATAR
+if (isset($_POST['set_avatar']) && isset($_FILES["avatar_file"])) {
+    $id = $_SESSION['id'];
+    $image = $_FILES["avatar_file"]["tmp_name"];
+    $type = $_FILES["avatar_file"]["type"];
+    $size = $_FILES["avatar_file"]["size"];
+
+    if ($type != "image/png") {
+        array_push($errors, "The image has to be a .png file");
+    }
+    
+    if ($size > 2000000) {
+        array_push($errors, "The image has to be less than 2 Mo");
+    }
+
+    $image_info = getimagesize($_FILES["avatar_file"]["tmp_name"]);
+
+    // vérifie si le fichier est bien une image
+    if (!is_array($image_info)) {
+        array_push($errors, "This file is not an image");
+    } else {
+        $image_width = $image_info[0];
+        $image_height = $image_info[1];
+
+        if ($image_width != $image_height || $image_width != 64 || $image_height != 64) {
+            array_push($errors, "The image has to be a 64x64 square");
+        }
+    }
+
+    if (count($errors) == 0) {
+        $target = "../avatars/" . $id . ".png";
+
+        if (move_uploaded_file($image, $target)) {
+            $sql = "UPDATE users SET avatar='$target' WHERE id=$id";
+            mysqli_query($db, $sql);
+
+            $_SESSION['avatar'] = $target;
+            array_push($success, "Image uploaded successfully");
+        } else {
+            array_push($errors, "Failed to upload image");
+        }
+    }
+}
+
+// RESET AVATAR
+if (isset($_POST['reset_avatar'])) {
+    $id = $_SESSION['id'];
+    $reset_image = '../avatars/0.png';
+
+    $sql = "UPDATE users SET avatar='$reset_image' WHERE id=$id";
+    mysqli_query($db, $sql);
+
+    $_SESSION['avatar'] = $reset_image;
+    array_push($success, "Avatar reset successfully");
+}

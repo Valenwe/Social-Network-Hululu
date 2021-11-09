@@ -84,3 +84,13 @@ form,
 .hide {
    display: none;
 }
+
+.avatar {
+   margin-right: auto;
+   margin-top: auto;
+   border-radius: 50%;
+}
+
+.comment_section {
+   border:solid black 1px;
+}
