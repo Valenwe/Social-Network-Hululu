@@ -1,0 +1,3 @@
+#ignoring all uploaded images
+avatars/*
+!avatars/0.png
