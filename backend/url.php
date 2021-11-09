@@ -11,7 +11,8 @@ $rules = array(
     "target_account" => "user=",
     "user_list" => "friends",
     "post" => "post",
-    "private_messages" => "pm"
+    "private_messages" => "pm",
+    "avatars" => "avatars"
 );
 
 $uri = rtrim(dirname($_SERVER["SCRIPT_NAME"]), '/');
@@ -21,7 +22,11 @@ $uri = urldecode($uri);
 // echo $uri;
 foreach ($rules as $url => $new_url) {
     if (preg_match('/' . $new_url . '/', $uri)) {
-        require("../pages/" . $url . '.php');
+        // dans le cas de 'avatars', on n'applique aucune règle
+        if ($url != "avatars")
+            require("../pages/" . $url . '.php');
+        else
+            require("../" . $uri);
         exit();
     }
 }

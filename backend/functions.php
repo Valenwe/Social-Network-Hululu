@@ -15,6 +15,7 @@ function set_session_value($user)
     $_SESSION['username'] = $user['username'];
     $_SESSION['id'] = $user['id'];
     $_SESSION['email'] = $user['email'];
+    $_SESSION['avatar'] = $user['avatar'];
 
     $_SESSION['follower'] = array();
     $_SESSION['following'] = array();
