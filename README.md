@@ -22,6 +22,7 @@ CREATE TABLE `users` (
   `username` varchar(100) CHARACTER SET latin1 NOT NULL,
   `email` varchar(100) CHARACTER SET latin1 NOT NULL,
   `password` varchar(100) CHARACTER SET latin1 NOT NULL,
+  `avatar` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'avatars/0.png',
   `firstname` varchar(100) CHARACTER SET latin1 DEFAULT NULL,
   `lastname` varchar(100) CHARACTER SET latin1 DEFAULT NULL,
   `creation_date` datetime NOT NULL DEFAULT current_timestamp(),
