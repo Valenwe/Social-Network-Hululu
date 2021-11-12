@@ -18,15 +18,15 @@ if (!empty($_SESSION["errors"])) {
 if (isset($_POST['reg_user'])) {
     // form validation: ensure that the form is correctly filled ...
     // by adding (array_push()) corresponding error unto $errors array
-    if (empty($_POST['reg_username'])) {
+    if (empty($_POST['reg_username']))
         array_push($errors, "Username is required");
-    }
-    if (empty($_POST['reg_email'])) {
+
+    if (empty($_POST['reg_email']))
         array_push($errors, "Email is required");
-    }
-    if (empty($_POST['reg_password_1'])) {
+    
+    if (empty($_POST['reg_password_1']))
         array_push($errors, "Password is required");
-    }
+    
 
     if (!empty($_POST['reg_username']) && !empty($_POST['reg_email']) && !empty($_POST['reg_password_1']) && !empty($_POST['reg_password_2'])) {
         // receive all input values from the form
@@ -35,13 +35,11 @@ if (isset($_POST['reg_user'])) {
         $password_1 = mysqli_real_escape_string($db, $_POST['reg_password_1']);
         $password_2 = mysqli_real_escape_string($db, $_POST['reg_password_2']);
 
-        if (!is_str_valid($username)) {
+        if (!is_str_valid($username))
             array_push($errors, "Invalid username (characters allowed are letters, numbers and '_')");
-        }
 
-        if ($password_1 != $password_2) {
+        if ($password_1 != $password_2)
             array_push($errors, "The two passwords do not match");
-        }
 
         // first check the database to make sure 
         // a user does not already exist with the same username and/or email
@@ -50,13 +48,11 @@ if (isset($_POST['reg_user'])) {
         if (!empty($result)) {
             $user = mysqli_fetch_assoc($result);
             if ($user) {
-                if ($user['username'] === $username) {
+                if ($user['username'] === $username)
                     array_push($errors, "Username already exists");
-                }
 
-                if ($user['email'] === $email) {
+                if ($user['email'] === $email)
                     array_push($errors, "Email already exists");
-                }
             }
         }
 
@@ -89,12 +85,11 @@ if (isset($_POST['log_user'])) {
     $username = mysqli_real_escape_string($db, $_POST['log_username']);
     $password = mysqli_real_escape_string($db, $_POST['log_password']);
 
-    if (empty($username)) {
+    if (empty($username))
         array_push($errors, "Username is required");
-    }
-    if (empty($password)) {
+
+    if (empty($password))
         array_push($errors, "Password is required");
-    }
 
     if (count($errors) == 0) {
         $query = "SELECT * FROM users WHERE username='$username'";
@@ -231,7 +226,7 @@ if (isset($_POST['set_avatar']) && isset($_FILES["avatar_file"])) {
     if ($type != "image/png") {
         array_push($errors, "The image has to be a .png file");
     }
-    
+
     if ($size > 2000000) {
         array_push($errors, "The image has to be less than 2 Mo");
     }

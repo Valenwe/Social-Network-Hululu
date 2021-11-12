@@ -1,3 +1,3 @@
-#ignoring all uploaded images
+#ignoring all uploaded images, but not the default one
 avatars/*
 !avatars/0.png

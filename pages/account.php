@@ -37,8 +37,9 @@ $publications = get_most_recent_publication(10, false);
         <h2>Account page</h2>
     </div>
     <div class="content">
-        <img class='avatar' src= '<?php echo $_SESSION["avatar"]; ?>'>
         <p><a class="btn" href="<?php echo $last_search ?>">Back</a></p>
+        <img class='avatar' src='<?php echo $_SESSION["avatar"]; ?>'>
+
         <?php require "../backend/popup.php" ?>
         <p>Name: <?php if (isset($_SESSION['firstname']) && isset($_SESSION['lastname'])) echo $_SESSION['firstname'] . " " . $_SESSION['lastname']; ?></p>
         <p>Username: <strong><?php echo $_SESSION['username']; ?></strong></p>
@@ -50,10 +51,10 @@ $publications = get_most_recent_publication(10, false);
             <p>Following: <?php if (!empty($_SESSION['following'])) echo count($_SESSION['following']);
                             else echo 0 ?></p>
         </a>
-
-        <div>
-            <?php display_publications($publications) ?>
-        </div>
+    </div>
+    <div>
+        <?php display_publications($publications, false) ?>
+    </div>
     </div>
 
     <script src="../sn/backend/jquery.min.js"></script>

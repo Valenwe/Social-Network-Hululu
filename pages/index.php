@@ -2,6 +2,7 @@
 session_start();
 
 include "../backend/functions.php";
+include "../backend/db.php";
 
 check_session_variables();
 
@@ -14,9 +15,8 @@ if (!empty($_SESSION["success"])) {
 }
 
 if (isset($_GET['logout'])) {
+    session_unset();
     session_destroy();
-    unset($_SESSION['username']);
-    unset($_SESSION['id']);
     header("location: /login");
 }
 
@@ -32,7 +32,7 @@ if (isset($_GET['search'])) {
     if (!preg_match("/^[a-zA-Z0-9-_]*$/", $_POST['ind_search_content'])) {
         array_push($errors, "Incorrect characters");
     } else {
-        $_SESSION['search'] = $_POST['ind_search_content'];
+        $_SESSION['search'] = mysqli_real_escape_string($db, strip_tags($_POST['ind_search_content']));
         header("location: /search");
     }
 } else {
@@ -94,7 +94,7 @@ if (!empty($_SESSION["following"])) {
     </div>
 
     <div class="content publications">
-        <?php display_publications($displayed_publications) ?>
+        <?php display_publications($displayed_publications, false) ?>
     </div>
     
 

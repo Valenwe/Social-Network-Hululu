@@ -85,12 +85,33 @@ form,
    display: none;
 }
 
+.comment_section {
+   border-style: outset;
+   border: 1px solid black;
+}
+
 .avatar {
    margin-right: auto;
    margin-top: auto;
    border-radius: 50%;
 }
 
-.comment_section {
-   border:solid black 1px;
+.lil_avatar {
+   border-radius: 50%;
+   size: 50%;  
+}
+
+.post, .message {
+   border-style: dotted dashed solid double;
+   border: 2px solid black;
+}
+
+.content_code {
+   background-color: gray;
+   font-family: 'Courier New', Courier, monospace;
+}
+
+.hashtag {
+   color: blue;
+   text-decoration: underline;
 }

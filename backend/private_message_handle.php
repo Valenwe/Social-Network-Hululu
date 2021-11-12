@@ -14,8 +14,10 @@ if (isset($_POST["send_message"])) {
         mysqli_query($db, $query);
 
         $currentDate = new DateTime();
-        $content = stripslashes($content);
+        $content = stripslashes(strip_tags($content));
 
-        echo "<div class='message'> <p>You " . $currentDate->format('Y-m-d H:i:s') . "</p> <p>" . $content . "</p> </div>";
+        // on crée une variable $pm en fonction de ce qu'on a reçu
+        $pm = array("id1" => $id, "id2" => $target_id, "content" => $content, "creation_date" => $currentDate->format('Y-m-d H:i:s'));
+        echo display_message($pm, "none");
     }
 }

@@ -8,7 +8,7 @@ if (!empty($_POST['function'])) {
     switch ($function2call) {
         case 'get_and_display_publications':
             $results = get_most_recent_publication($_POST["row"], true);
-            display_publications($results);
+            display_publications($results, false);
             break;
 
         case "get_and_display_comments":

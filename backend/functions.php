@@ -1,17 +1,10 @@
 <?php
-// https://www.writephponline.com/
-function debug($msg, $exit)
-{
-    echo '<pre>';
-    print_r($msg);
-    if ($exit) {
-        exit;
-    }
-}
+require "../backend/basic_functions.php";
 
 // on attribue toutes les valeurs de la session (pour du local)
 function set_session_value($user)
 {
+    session_unset();
     $_SESSION['username'] = $user['username'];
     $_SESSION['id'] = $user['id'];
     $_SESSION['email'] = $user['email'];
@@ -43,31 +36,6 @@ function check_session_variables()
         array_push($_SESSION["errors"], "You must be logged in first");
         header('location: /login');
     }
-}
-
-// va retirer uniquement le premier patern trouvé
-function str_replace_first($from, $to, $content)
-{
-    $from = '/' . preg_quote($from, '/') . '/';
-    return preg_replace($from, $to, $content, 1);
-}
-
-// vérifie si on follow un user
-function is_following($friend_id)
-{
-    if (!empty($_SESSION["following"])) {
-        return in_array($friend_id, $_SESSION["following"]);
-    }
-    return false;
-}
-
-// vérifie si un user est un follower
-function is_follower($friend_id)
-{
-    if (!empty($_SESSION["follower"])) {
-        return in_array($friend_id, $_SESSION["follower"]);
-    }
-    return false;
 }
 
 // ajoute un follow d'un user
@@ -110,13 +78,13 @@ function remove_follow($db, $friend)
         $new_following = $_SESSION["following"];
     }
     $friend_id = $friend["id"];
-    
+
     if (is_following($friend_id)) {
         // on change le user target
         if (!empty($friend["follower"])) {
             $new_follower = explode(" ", $friend["follower"]);
         }
-        
+
         unset($new_follower[array_search($_SESSION["id"], $new_follower)]);
         $str_new_follower = implode(" ", $new_follower);
         $query = "UPDATE users SET follower = '$str_new_follower' WHERE id='$friend_id'";
@@ -154,8 +122,9 @@ function post($id, $title, $content)
 {
     include "../backend/db.php";
 
-    $title = addslashes($title);
-    $content = addslashes($content);
+    // strip_tags remove any existing HTML tag
+    $title = addslashes(strip_tags($title));
+    $content = addslashes(strip_tags($content));
 
     $query = "INSERT INTO publications (id, title, content, likes) VALUES('$id', '" . $title . "', '" . $content . "', '')";
     mysqli_query($db, $query);
@@ -223,6 +192,54 @@ function get_user($id)
         return null;
 }
 
+function display_comment($comment, $db)
+{
+    $author_id = $comment["id"];
+    $comment_id = $comment["comment_id"];
+
+    // on récupère username
+    $query = "SELECT username FROM users WHERE id='$author_id'";
+    $result = mysqli_query($db, $query);
+    if ($result) {
+        $author = mysqli_fetch_assoc($result);
+        $username = $author["username"];
+    }
+
+    $content = stripslashes($comment["content"]);
+    $date = $comment["creation_date"];
+
+    $html = "<div class='comment_section' id=$comment_id>";
+    $html .= "<p class='comment_header'>By <a href='/search?target=user_$username'>$username</a> | $date</p>";
+
+    if ($comment["modified"] == 1) $html .= "<p>Modified</p>";
+
+    if ($comment["id"] == $_SESSION["id"]) {
+        $html .= "<span class='delete_comment interactable' data-id=$comment_id>Delete </span>";
+        $html .= "<span class='edit_comment interactable' data-id=$comment_id>Edit</span>";
+    }
+
+    $html .= "</br><p class='comment_content'>" . enrich_content($content) . "</p>";
+    $html .= "</div>";
+
+    // partie éditable du commentaire
+    if ($comment["id"] == $_SESSION["id"]) {
+
+        $html .= "<form method='post' class='edit_comment_form hide' id=$comment_id>
+                <div class='input-group'>
+                    <textarea type='text' name='edit_content' placeholder='Text'>$content</textarea>
+                </div>
+                <div class='input-group'>
+                    <button type='button' class='btn edit_comment_cancel'>Cancel</button>
+                </div>
+                <div class='input-group'>
+                    <button type='submit' class='btn' name='edit'>Save</button>
+                </div>
+                </form>";
+    }
+
+    return $html;
+}
+
 function display_comments($post_id, $limit, $hidden)
 {
     include "../backend/db.php";
@@ -238,8 +255,8 @@ function display_comments($post_id, $limit, $hidden)
         $html .= "<div class='comments'>";
     }
 
-    $html .= "<div data-id='$post_id'> <input class='add_comment_content' placeholder='Comment'>";
-    $html .= "<button type='button' class='add_comment'>Add</button> </div>";
+    $html .= "<div data-id='$post_id'> <textarea class='add_comment_content' placeholder='Comment'></textarea>";
+    $html .= "<button type='button' class='btn add_comment'>Add</button> </div>";
 
     // on récupère les commentaires
     $query = "SELECT * FROM comments WHERE post_id='$post_id' ORDER BY creation_date DESC LIMIT $limit";
@@ -247,47 +264,7 @@ function display_comments($post_id, $limit, $hidden)
 
     if (mysqli_num_rows($comments_result) > 0) {
         while ($comment = mysqli_fetch_assoc($comments_result)) {
-            $author_id = $comment["id"];
-            $comment_id = $comment["comment_id"];
-
-            // on récupère username
-            $query = "SELECT * FROM users WHERE id='$author_id'";
-            $result = mysqli_query($db, $query);
-            if ($result) {
-                $username = mysqli_fetch_assoc($result)["username"];
-            }
-
-            $content = stripslashes($comment["content"]);
-            $date = $comment["creation_date"];
-
-            $html .= "<div class='comment_section' id=$comment_id>";
-            $html .= "<p class='comment_header'>By $username | $date</p>";
-
-            if ($comment["modified"] == 1) $html .= "<p>Modified</p>";
-
-            if ($comment["id"] == $_SESSION["id"]) {
-                $html .= "<span class='delete_comment interactable' data-id=$comment_id>Delete </span>";
-                $html .= "<span class='edit_comment interactable' data-id=$comment_id>Edit</span>";
-            }
-
-            $html .= "</br><p class='comment_content'>$content</p>";
-            $html .= "</div>";
-
-            // partie éditable du commentaire
-            if ($comment["id"] == $_SESSION["id"]) {
-
-                $html .= "<form method='post' class='edit_comment_form hide' id=$comment_id>
-                <div class='input-group'>
-                    <input type='text' name='edit_content' placeholder='Text' value='$content'>
-                </div>
-                <div class='input-group'>
-                    <button type='button' class='btn edit_comment_cancel'>Cancel</button>
-                </div>
-                <div class='input-group'>
-                    <button type='submit' class='btn' name='edit'>Save</button>
-                </div>
-                </form>";
-            }
+            $html .= display_comment($comment, $db);
         }
 
         $count = mysqli_num_rows($comments_result);
@@ -307,7 +284,7 @@ function display_comments($post_id, $limit, $hidden)
 }
 
 // print une liste de publications données
-function display_publications($publications)
+function display_publications($publications, $edited)
 {
     include "../backend/db.php";
     $html = "";
@@ -330,10 +307,12 @@ function display_publications($publications)
 
             $author = get_user($post["id"]);
             $author_name = $author["username"];
+            $avatar = $author["avatar"];
 
             $date_time = new DateTime($post['creation_date']);
             $date = $date_time->format('d/m/y H:i');
 
+            $html .= "<a href='/search?target=user_$author_name'><img class='lil_avatar' src='$avatar'></a>";
             $html .= "<h3 class='post_title'>$title</h3>";
 
             if ($post["modified"]) $html .= "<p>Modified</p>";
@@ -345,8 +324,9 @@ function display_publications($publications)
                 $html .= "<span class='edit_post interactable' data-id=$post_id>Edit</span>";
             }
 
-            $html .= "<p>From $author_name</p> </br>";
-            $html .= "<p class='post_content'>$content</p>";
+            $html .= "<p>From <a href='/search?target=user_$author_name'>$author_name</a></p> </br>";
+
+            $html .= "<p class='post_content'>" . enrich_content($content) . "</p>";
 
             $html .= "<span class='likes_count'> " . count($likes) . " likes  </span>";
 
@@ -373,7 +353,7 @@ function display_publications($publications)
                     <input type='text' name='edit_title' placeholder='Title' value='$title'>
                 </div>
                 <div class='input-group'>
-                    <input type='text' name='edit_content' placeholder='Text' value='$content'>
+                    <textarea type='text' name='edit_content' placeholder='Text'>$content</textarea>
                 </div>
                 <div class='input-group'>
                     <button type='button' class='btn edit_post_cancel'>Cancel</button>
@@ -384,15 +364,35 @@ function display_publications($publications)
                 </form>";
             }
         }
-        if (count($publications) % 5 != 0)
+        if (count($publications) % 5 != 0 && !$edited)
             $html .= "<p>End of the publications</p>";
     } else {
         $html .= "<div class='content'> <p> No publications yet </p> </div>";
     }
 
-    $count = count($publications);
-    $html .= "<input type='hidden' class='post_counter' value=$count>";
+    if (!$edited) {
+        $count = count($publications);
+        $html .= "<input type='hidden' class='post_counter' value=$count>";
+    }
+
     echo $html;
+}
+
+// affiche un message privé
+function display_message($pm, $target_username)
+{
+    $id = $_SESSION["id"];
+    $response = "<div class='message'>";
+
+    if ($pm["id1"] == $id) {
+        $response .= "<p class='message_header'>You " . $pm["creation_date"] . "</p> <p class='message_content'>" . enrich_content($pm["content"]) . "</p>";
+    } else if ($pm["id2"] == $id) {
+        $response .= "<p class='message_header'>" . $target_username . " " . $pm["creation_date"] . "</p> <p class='message_content'>" . enrich_content($pm["content"]) . "</p>";
+    }
+
+    $response .= "</div>";
+
+    return $response;
 }
 
 // affiche une conversation
@@ -443,7 +443,8 @@ function display_conversation($target_id, $limit, $hidden)
     $nb_pm = 0;
     for ($i = 0; $i < count($pms); $i++) {
         $pm = $pms[$i];
-        if ($pm["id1"] == $id || $pm["id2"] == $id) {
+
+        if ($pms[$i]["id1"] == $id || $pms[$i]["id2"] == $id) {
 
             // partie pour accéder aux messages plus anciens
             if ($nb_pm == 0 && $limit % 5 == 0) {
@@ -451,15 +452,7 @@ function display_conversation($target_id, $limit, $hidden)
             }
 
             $nb_pm++;
-            $response .= "<div class='message'>";
-
-            if ($pm["id1"] == $id) {
-                $response .= "<p>You " . $pm["creation_date"] . "</p> <p>" . $pm["content"] . "</p>";
-            } else if ($pm["id2"] == $id) {
-                $response .= "<p>" . $target_username . " " . $pm["creation_date"] . "</p> <p>" . $pm["content"] . "</p>";
-            }
-
-            $response .= "</div>";
+            $response .= display_message($pm, $target_username);
         }
     }
 
@@ -469,7 +462,7 @@ function display_conversation($target_id, $limit, $hidden)
         $response .= "<input type='hidden' class='message_counter' value=$nb_pm>";
     }
 
-    $response .= "<input class='new_message_content' placeholder='New message'>";
+    $response .= "<textarea class='new_message_content' placeholder='New message'></textarea>";
     $response .= "<span class='send_message interactable'>Send</span>";
     $response .= "</div> </div>";
 
@@ -481,7 +474,7 @@ function display_pms($id, $target_id)
 {
     include "../backend/db.php";
 
-    // on récupère tous les pms qui concernent l'id
+    // on récupère tous les pms qui concernent l'id dans l'ordre du plus récent
     $query = "SELECT * FROM private_messages WHERE id1=$id OR id2=$id ORDER BY creation_date DESC";
     $results = mysqli_query($db, $query);
 
@@ -510,9 +503,6 @@ function display_pms($id, $target_id)
     // si on veut créer un nouveau message, on ajoute un onglet
     if (!in_array($target_id, $target_pms) && $target_id != -1) array_push($target_pms, $target_id);
 
-    // on reverse pour avoir les plus conversations récentes en premier
-    $target_pms = array_reverse($target_pms);
-
     $response = "";
     foreach ($target_pms as $target_id) {
         $response .= display_conversation($target_id, 5, 1);
@@ -523,14 +513,37 @@ function display_pms($id, $target_id)
     return $response;
 }
 
-// detecte si un string n'est pas utilisable pour une query sql
-function is_str_valid($str)
+// permet d'ajouter des couleurs / changement de police pour tout contenu
+function enrich_content($content)
 {
-    return preg_match("/^[a-zA-Z0-9-_-]*$/", $str);
-}
+    // remove any existing HTML tag
+    $rich_content = $content;
 
-// transforme un string en un string valide pour une requête sql
-function get_valid_str($str)
-{
-    return preg_replace("~[^a-zA-Z0-9-_:]~i", "", $str);
+    // mise en place du sautage de ligne
+    $rich_content = str_replace("\n", "<br>", $rich_content);
+    $rich_content = str_replace("\r", "<br>", $rich_content);
+
+    // code appending
+    while (strpos($rich_content, "```", strpos($rich_content, "```") + 1) != strpos($rich_content, "```") && gettype(strpos($rich_content, "```", strpos($rich_content, "```") + 1)) != "boolean") {
+        $rich_content = str_replace_first("```", "<span class='content_code'>", $rich_content);
+        $rich_content = str_replace_first("```", "</span>", $rich_content);
+    }
+
+    // add hashtag colors
+    if (gettype(strpos($rich_content, "#", 0)) != "boolean") {
+        $offset = 0;
+        // tant qu'il y a un #, et qu'il est soit au début, soit possède un ' ' avant lui-même
+        while (gettype(strpos($rich_content, "#", $offset)) != "boolean" && (strpos($rich_content, "#", $offset) > 0 && $rich_content[strpos($rich_content, "#", $offset) - 1] == ' ') || strpos($rich_content, "#", $offset) == 0) {
+            $rich_content = str_replace_first("#", "<span class='hashtag'>#", $rich_content, $offset);
+            $offset = strpos($rich_content, "#", $offset) + 1;
+    
+            if (strpos($rich_content, " ", $offset) != 0) {
+                $rich_content = str_replace_first(" ", "</span> ", $rich_content, $offset);
+            } else {
+                $rich_content .= "</span>";
+            }
+        }
+    }
+
+    return $rich_content;
 }
