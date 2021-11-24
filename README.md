@@ -51,6 +51,15 @@ CREATE TABLE `comments` (
   `creation_date` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`comment_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `private_messages` (
+  `pm_id` int(11) NOT NULL AUTO_INCREMENT,
+  `id1` int(11) NOT NULL,
+  `id2` int(11) NOT NULL,
+  `content` longtext CHARACTER SET latin1 NOT NULL,
+  `creation_date` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`pm_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 * Then go in its root folder, and create a new directory inside `/htdocs/`, called `sn`
