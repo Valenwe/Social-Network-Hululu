@@ -1,6 +1,5 @@
 <?php
 include('../backend/server.php');
-
 check_session_variables();
 
 if (isset($_GET['showfollowing'])) {

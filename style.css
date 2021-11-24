@@ -115,3 +115,11 @@ form,
    color: blue;
    text-decoration: underline;
 }
+
+.received_message {
+   text-align: right;
+}
+
+.sent_messages {
+   text-align: left;
+}

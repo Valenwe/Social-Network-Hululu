@@ -20,7 +20,7 @@ $(document).ready(function () {
       input = conversation.find(".new_message_content");
       target_id = conversation.parent().attr("id");
       content = input.val();
-      
+
       $.ajax({
          url: "../sn/backend/private_message_handle.php",
          type: "post",
@@ -61,21 +61,38 @@ $(document).ready(function () {
    });
 
    // check toutes les 3 secondes s'il y a de nouveaux messages
-   window.setTimeout(function () {
-      $(".content:first").find(".content").each(function() {
-         target_id = $(this).attr("id");
-         counter = $(this).find(".message_counter");
-         hidden = Number($(this).find(".conversation").hasClass("hide"));
-         
-         $.ajax({
-            url: "../sn/backend/function_caller.php",
-            type: "post",
-            data: { row: counter.val(), target_id: target_id, hidden: hidden, function: "get_and_display_messages" },
-            success: function (response) {
-               $(this).after(response);
-               $(this).remove();
-            }
+   window.setInterval(function () {
+      $(".content:first")
+         .find(".content")
+         .each(function () {
+            content = $(this);
+            target_id = content.attr("id");
+            counter = content.find(".message_counter");
+            last_message_id = content.find(".last_message_id").val();
+            hidden = Number(content.find(".conversation").hasClass("hide"));
+
+            has_new_messages = false;
+            $.ajax({
+               url: "../sn/backend/function_caller.php",
+               type: "post",
+               data: { target_id: target_id, last_message_id: last_message_id, function: "has_new_messages" },
+               success: function (response) {
+                  has_new_messages = response;
+
+                  // s'il y a un nouveau message
+                  if (has_new_messages == 1) {
+                     $.ajax({
+                        url: "../sn/backend/function_caller.php",
+                        type: "post",
+                        data: { row: counter.val(), target_id: target_id, hidden: hidden, function: "get_and_display_messages" },
+                        success: function (response) {
+                           content.after(response);
+                           content.remove();
+                        }
+                     });
+                  }
+               }
+            });
          });
-      });
    }, 3000);
 });

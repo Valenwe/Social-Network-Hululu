@@ -42,11 +42,11 @@ foreach ($_GET as $key => $value) {
         if (isset($_SESSION['search'])) {
             $target = $_SESSION['search'];
             $query = "SELECT * FROM users WHERE username LIKE '%$target%'";
-            $results = mysqli_query($db, $query);
+            $results = special_find_query($query);
 
-            if (mysqli_num_rows($results) > 0) {
-                echo mysqli_num_rows($results) . " results found" . "<br><br>";
-                while ($row = mysqli_fetch_assoc($results)) {
+            if (count($results) > 0) {
+                echo count($results) . " results found" . "<br><br>";
+                foreach ($results as $row) {
                     $display = "Username: " . $row["username"];
                     if (!empty($row["firstname"]) || !empty($row["lastname"])) {
                         $display .= " - Name: ";

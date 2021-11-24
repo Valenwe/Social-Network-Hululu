@@ -18,6 +18,19 @@ if (!empty($_POST['function'])) {
         case "get_and_display_messages":
             echo display_conversation($_POST["target_id"], $_POST["row"], $_POST["hidden"]);
             break;
+
+        case "has_new_messages":
+            $id = $_SESSION["id"];
+            $target_id = $_POST["target_id"];
+            $last_message_id = $_POST["last_message_id"];
+            $query = "SELECT pm_id FROM private_messages WHERE (id1=$id AND id2=$target_id) OR (id1=$target_id AND id2=$id) ORDER BY creation_date DESC LIMIT 1";
+            $last_msg = special_find_query($query)[0];
+            
+            if ($last_msg["pm_id"] != $last_message_id)
+                echo 1;
+            else
+                echo 0;
+            break;
     }
 
     unset($_POST["function"]);

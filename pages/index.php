@@ -1,8 +1,6 @@
 <?php
 session_start();
-
 include "../backend/functions.php";
-include "../backend/db.php";
 
 check_session_variables();
 
@@ -32,7 +30,7 @@ if (isset($_GET['search'])) {
     if (!preg_match("/^[a-zA-Z0-9-_]*$/", $_POST['ind_search_content'])) {
         array_push($errors, "Incorrect characters");
     } else {
-        $_SESSION['search'] = mysqli_real_escape_string($db, strip_tags($_POST['ind_search_content']));
+        $_SESSION['search'] = addslashes(strip_tags($_POST['ind_search_content']));
         header("location: /search");
     }
 } else {
@@ -47,11 +45,7 @@ if (isset($_GET['new_post']))
 if (isset($_GET['pm']))
     header("location: /pm");
 
-
-$displayed_publications = array();
-if (!empty($_SESSION["following"])) {
-    $displayed_publications = get_most_recent_publication(5, true);
-}
+$displayed_publications = get_most_recent_publication(5, true);
 ?>
 
 <!DOCTYPE html>

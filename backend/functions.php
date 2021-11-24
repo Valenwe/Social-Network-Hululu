@@ -1,6 +1,5 @@
 <?php
-require "../backend/basic_functions.php";
-
+include "../backend/basic_functions.php";
 // on attribue toutes les valeurs de la session (pour du local)
 function set_session_value($user)
 {
@@ -13,18 +12,24 @@ function set_session_value($user)
     $_SESSION['follower'] = array();
     $_SESSION['following'] = array();
 
-    if (!is_null($user['firstname'])) {
+    if (!is_null($user['firstname']))
         $_SESSION['firstname'] = $user['firstname'];
-    }
-    if (!is_null($user['lastname'])) {
+
+    if (!is_null($user['lastname']))
         $_SESSION['lastname'] = $user['lastname'];
-    }
-    if (!empty($user['follower'])) {
+
+    if (!empty($user['follower']))
         $_SESSION['follower'] = explode(" ", $user['follower']);
-    }
-    if (!empty($user['following'])) {
+
+    if (!empty($user['following']))
         $_SESSION['following'] = explode(" ", $user['following']);
-    }
+
+    // retire une valeur vide si existante
+    if (empty($_SESSION["following"][0]))
+        unset($_SESSION["following"][0]);
+
+    if (empty($_SESSION["follower"][0]))
+        unset($_SESSION["follower"][0]);
 }
 
 // check si quelqu'un ne possède pas toutes les variables de session
@@ -39,30 +44,30 @@ function check_session_variables()
 }
 
 // ajoute un follow d'un user
-function add_follow($db, $friend)
+function add_follow($friend)
 {
     $new_following = array();
     $new_follower = array();
-    if (!empty($_SESSION["following"])) {
+
+    if (!empty($_SESSION["following"]))
         $new_following = $_SESSION["following"];
-    }
+
     $friend_id = $friend["id"];
     if (!is_following($friend_id)) {
         // on change le user target
-        if (!empty($friend["follower"])) {
+        if (!empty($friend["follower"]))
             $new_follower = explode(" ", $friend["follower"]);
-        }
+
         array_push($new_follower, $_SESSION["id"]);
         $str_new_follower = implode(" ", $new_follower);
-        $query = "UPDATE users SET follower = '$str_new_follower' WHERE id='$friend_id'";
-        mysqli_query($db, $query);
+        update("users", array("follower" => $str_new_follower), array("id" => $friend_id));
 
         // on change notre compte user
         array_push($new_following, $friend_id);
         $str_new_following = implode(" ", $new_following);
         $id = $_SESSION["id"];
-        $query = "UPDATE users SET following = '$str_new_following' WHERE id='$id'";
-        mysqli_query($db, $query);
+
+        update("users", array("following" => $str_new_following), array("id" => $id));
         $_SESSION["following"] = $new_following;
         return true;
     }
@@ -70,7 +75,7 @@ function add_follow($db, $friend)
 }
 
 // retire un follow
-function remove_follow($db, $friend)
+function remove_follow($friend)
 {
     $new_following = array();
     $new_follower = array();
@@ -87,32 +92,17 @@ function remove_follow($db, $friend)
 
         unset($new_follower[array_search($_SESSION["id"], $new_follower)]);
         $str_new_follower = implode(" ", $new_follower);
-        $query = "UPDATE users SET follower = '$str_new_follower' WHERE id='$friend_id'";
-        mysqli_query($db, $query);
+        update("users", array("follower" => $str_new_follower), array("id" => $friend_id));
 
         // on change notre compte user
         unset($new_following[array_search($friend_id, $new_following)]);
         $str_new_following = implode(" ", $new_following);
         $id = $_SESSION["id"];
-        $query = "UPDATE users SET following = '$str_new_following' WHERE id='$id'";
-        mysqli_query($db, $query);
+        update("users", array("following" => $str_new_following), array("id" => $id));
         $_SESSION["following"] = $new_following;
         return true;
     }
     return false;
-}
-
-// actualise les valeurs d'un utilisateur
-function refresh_user($db, $user)
-{
-    $id = $user["id"];
-    $query = "SELECT * FROM users WHERE id='$id'";
-    $result = mysqli_query($db, $query);
-
-    if ($result) {
-        $target =  mysqli_fetch_assoc($result);
-        return $target;
-    }
 }
 
 // poste une publication
@@ -120,90 +110,46 @@ function refresh_user($db, $user)
 // addslashes permet de gérer les caractères problématiques comme ' \ " 
 function post($id, $title, $content)
 {
-    include "../backend/db.php";
-
-    // strip_tags remove any existing HTML tag
-    $title = addslashes(strip_tags($title));
-    $content = addslashes(strip_tags($content));
-
-    $query = "INSERT INTO publications (id, title, content, likes) VALUES('$id', '" . $title . "', '" . $content . "', '')";
-    mysqli_query($db, $query);
-
-    // get process id
-    $db_id = mysqli_thread_id($db);
-    // Kill connection
-    mysqli_kill($db, $db_id);
+    create("publications", array("id" => $id, "title" => $title, "content" => $content, "likes" => ""));
 }
 
 // récupère les plus récentes publications
 function get_most_recent_publication($limit, $in_home)
 {
     check_session_variables();
-    include "../backend/db.php";
     $following = array();
 
-    if ($in_home) {
+    if ($in_home)
         $following = $_SESSION["following"];
-    }
 
     // on ajoute aussi l'id de la session
     array_push($following, $_SESSION["id"]);
     $following_str = "(" . implode(", ", $following) . ")";
 
-    $query = "SELECT * FROM publications WHERE id IN $following_str ORDER BY creation_date DESC LIMIT $limit";
-    $results = mysqli_query($db, $query);
-
-    $db_id = mysqli_thread_id($db);
-    mysqli_kill($db, $db_id);
-
-    if ($results) {
-        $publications = array();
-        if (mysqli_num_rows($results) > 0) {
-            while ($row = mysqli_fetch_assoc($results)) {
-                $row["title"] = stripslashes($row["title"]);
-                $row["content"] = stripslashes($row["content"]);
-                array_push($publications, $row);
-            }
-        }
-        return $publications;
-    } else {
-        return null;
-    }
+    // $query = "SELECT * FROM publications WHERE id IN $following_str ORDER BY creation_date DESC LIMIT $limit";
+    $publications = find("publications", array("id" => $following_str), $limit, array(), "AND", true, true);
+    return $publications;
 }
 
 // récupère un utilisateur avec un id
 function get_user($id)
 {
-    include "../backend/db.php";
+    $user = find("users", array("id" => $id), 1);
 
-    $query = "SELECT * FROM users WHERE id='$id'";
-    $result = mysqli_query($db, $query);
-
-    $db_id = mysqli_thread_id($db);
-    mysqli_kill($db, $db_id);
-
-    if ($result) {
-        $user = mysqli_fetch_assoc($result);
-        if ($user)
-            return $user;
-        else
-            return null;
-    } else
+    if ($user)
+        return $user;
+    else
         return null;
 }
 
-function display_comment($comment, $db)
+function display_comment($comment)
 {
     $author_id = $comment["id"];
     $comment_id = $comment["comment_id"];
 
     // on récupère username
-    $query = "SELECT username FROM users WHERE id='$author_id'";
-    $result = mysqli_query($db, $query);
-    if ($result) {
-        $author = mysqli_fetch_assoc($result);
-        $username = $author["username"];
-    }
+    $author = find("users", array("id" => $author_id), 1, array("username"));
+    $username = $author["username"];
 
     $content = stripslashes($comment["content"]);
     $date = $comment["creation_date"];
@@ -242,8 +188,6 @@ function display_comment($comment, $db)
 
 function display_comments($post_id, $limit, $hidden)
 {
-    include "../backend/db.php";
-
     // comment section
     if ($hidden) {
         $html = "<span class='show_comments interactable' data-id=$post_id>Show comments</span>";
@@ -259,15 +203,14 @@ function display_comments($post_id, $limit, $hidden)
     $html .= "<button type='button' class='btn add_comment'>Add</button> </div>";
 
     // on récupère les commentaires
-    $query = "SELECT * FROM comments WHERE post_id='$post_id' ORDER BY creation_date DESC LIMIT $limit";
-    $comments_result = mysqli_query($db, $query);
+    $comments = find("comments", array("post_id" => $post_id), $limit, array(), "AND", true);
 
-    if (mysqli_num_rows($comments_result) > 0) {
-        while ($comment = mysqli_fetch_assoc($comments_result)) {
-            $html .= display_comment($comment, $db);
+    if (count($comments) > 0) {
+        foreach ($comments as $comment) {
+            $html .= display_comment($comment);
         }
 
-        $count = mysqli_num_rows($comments_result);
+        $count = count($comments);
         if ($count % 5 == 0) {
             $html .= "<span class='interactable show_more_comments'>Show more</span>";
             $html .= "<input class='comment_counter' type='hidden' id='$post_id' value=$count>";
@@ -286,12 +229,11 @@ function display_comments($post_id, $limit, $hidden)
 // print une liste de publications données
 function display_publications($publications, $edited)
 {
-    include "../backend/db.php";
     $html = "";
     if ($publications != null && count($publications) > 0) {
         foreach ($publications as $post) {
-            $title = stripslashes($post["title"]);
-            $content = stripslashes($post["content"]);
+            $title = $post["title"];
+            $content = $post["content"];
             $post_id = $post["post_id"];
 
             // id est nécessaire pour localiser le post si on le delete
@@ -364,6 +306,7 @@ function display_publications($publications, $edited)
                 </form>";
             }
         }
+
         if (count($publications) % 5 != 0 && !$edited)
             $html .= "<p>End of the publications</p>";
     } else {
@@ -385,9 +328,9 @@ function display_message($pm, $target_username)
     $response = "<div class='message'>";
 
     if ($pm["id1"] == $id) {
-        $response .= "<p class='message_header'>You " . $pm["creation_date"] . "</p> <p class='message_content'>" . enrich_content($pm["content"]) . "</p>";
+        $response .= "<p class='message_header sent_message'>You " . $pm["creation_date"] . "</p> <p class='message_content'>" . enrich_content($pm["content"]) . "</p>";
     } else if ($pm["id2"] == $id) {
-        $response .= "<p class='message_header'>" . $target_username . " " . $pm["creation_date"] . "</p> <p class='message_content'>" . enrich_content($pm["content"]) . "</p>";
+        $response .= "<p class='message_header received_message'>" . $target_username . " " . $pm["creation_date"] . "</p> <p class='message_content'>" . enrich_content($pm["content"]) . "</p>";
     }
 
     $response .= "</div>";
@@ -398,38 +341,27 @@ function display_message($pm, $target_username)
 // affiche une conversation
 function display_conversation($target_id, $limit, $hidden)
 {
-    include "../backend/db.php";
     $id = $_SESSION["id"];
 
     // on récupère tous les pms qui concernent l'id
     $query = "SELECT * FROM private_messages WHERE (id1=$id AND id2=$target_id) OR (id1=$target_id AND id2=$id) ORDER BY creation_date DESC LIMIT $limit";
-    $results = mysqli_query($db, $query);
-
-    $pms = array();
-    if ($results) {
-        if (mysqli_num_rows($results) > 0) {
-            while ($row = mysqli_fetch_assoc($results)) {
-                $row["content"] = stripslashes($row["content"]);
-                array_push($pms, $row);
-            }
-        }
-    }
+    $pms = special_find_query($query);
 
     // on reverse pour afficher les messages moins récents en premiers
     $pms = array_reverse($pms);
 
-    $query = "SELECT username FROM users WHERE id='$target_id'";
-    $target_username = mysqli_fetch_assoc(mysqli_query($db, $query))["username"];
+    $target = find("users", array("id" => $target_id), 1, array("username"));
+    $target_username = $target["username"];
 
     // title
     $response = "<div class='content' id=$target_id>";
-    $response .= "<h3>$target_username</h3>";
+    $response .= "<a href='/search?target=user_$target_username'> <h3>$target_username</h3> </a>";
 
     if ($hidden) {
         $response .= "<span class='show_conversation interactable'>Expand</span>";
         $response .= "<span class='hide_conversation interactable hide'>Hide</span>";
 
-        // messages
+        // messages (caché)
         $response .= "<div class='conversation hide'>";
     } else {
         $response .= "<span class='show_conversation interactable hide'>Expand</span>";
@@ -460,10 +392,17 @@ function display_conversation($target_id, $limit, $hidden)
         $response .= "<p>No messages yet</p>";
     } else {
         $response .= "<input type='hidden' class='message_counter' value=$nb_pm>";
+        $response .= "<input type='hidden' class='last_message_id' value=" . end($pms)["pm_id"] . ">";
     }
 
-    $response .= "<textarea class='new_message_content' placeholder='New message'></textarea>";
-    $response .= "<span class='send_message interactable'>Send</span>";
+    // si on est plus follow ou qu'on le follow plus, impossible d'envoyer un message
+    if (in_array($target_id, $_SESSION["following"]) && in_array($target_id, $_SESSION["follower"])) {
+        $response .= "<textarea class='new_message_content' placeholder='New message'></textarea>";
+        $response .= "<span class='send_message interactable'>Send</span>";
+    } else {
+        $response .= "<textarea disabled class='new_message_content' placeholder='Message disabled because you are not following each other'></textarea>";
+    }
+
     $response .= "</div> </div>";
 
     return $response;
@@ -472,21 +411,9 @@ function display_conversation($target_id, $limit, $hidden)
 // affiche les onglets des messages privés
 function display_pms($id, $target_id)
 {
-    include "../backend/db.php";
-
     // on récupère tous les pms qui concernent l'id dans l'ordre du plus récent
     $query = "SELECT * FROM private_messages WHERE id1=$id OR id2=$id ORDER BY creation_date DESC";
-    $results = mysqli_query($db, $query);
-
-    $pms = array();
-    if ($results) {
-        if (mysqli_num_rows($results) > 0) {
-            while ($row = mysqli_fetch_assoc($results)) {
-                $row["content"] = stripslashes($row["content"]);
-                array_push($pms, $row);
-            }
-        }
-    }
+    $pms = special_find_query($query);
 
     // on définit tous les onglets de pms à créer
     $target_pms = array();
@@ -536,7 +463,7 @@ function enrich_content($content)
         while (gettype(strpos($rich_content, "#", $offset)) != "boolean" && (strpos($rich_content, "#", $offset) > 0 && $rich_content[strpos($rich_content, "#", $offset) - 1] == ' ') || strpos($rich_content, "#", $offset) == 0) {
             $rich_content = str_replace_first("#", "<span class='hashtag'>#", $rich_content, $offset);
             $offset = strpos($rich_content, "#", $offset) + 1;
-    
+
             if (strpos($rich_content, " ", $offset) != 0) {
                 $rich_content = str_replace_first(" ", "</span> ", $rich_content, $offset);
             } else {

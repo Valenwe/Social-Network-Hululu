@@ -1,6 +1,5 @@
 <?php
 include "../backend/functions.php";
-include "../backend/db.php";
 session_start();
 
 // initializing variables
@@ -30,10 +29,10 @@ if (isset($_POST['reg_user'])) {
 
     if (!empty($_POST['reg_username']) && !empty($_POST['reg_email']) && !empty($_POST['reg_password_1']) && !empty($_POST['reg_password_2'])) {
         // receive all input values from the form
-        $username = mysqli_real_escape_string($db, $_POST['reg_username']);
-        $email = mysqli_real_escape_string($db, $_POST['reg_email']);
-        $password_1 = mysqli_real_escape_string($db, $_POST['reg_password_1']);
-        $password_2 = mysqli_real_escape_string($db, $_POST['reg_password_2']);
+        $username = $_POST['reg_username'];
+        $email = $_POST['reg_email'];
+        $password_1 = $_POST['reg_password_1'];
+        $password_2 = $_POST['reg_password_2'];
 
         if (!is_str_valid($username))
             array_push($errors, "Invalid username (characters allowed are letters, numbers and '_')");
@@ -43,17 +42,13 @@ if (isset($_POST['reg_user'])) {
 
         // first check the database to make sure 
         // a user does not already exist with the same username and/or email
-        $user_check_query = "SELECT username, email FROM users WHERE username=$username OR email=$email";
-        $result = mysqli_query($db, $user_check_query);
-        if (!empty($result)) {
-            $user = mysqli_fetch_assoc($result);
-            if ($user) {
-                if ($user['username'] === $username)
-                    array_push($errors, "Username already exists");
+        $user = find("users", array("username" => $username, "email" => $email), 1, array("username", "email"), "OR");
+        if ($user) {
+            if ($user['username'] === $username)
+                array_push($errors, "Username already exists");
 
-                if ($user['email'] === $email)
-                    array_push($errors, "Email already exists");
-            }
+            if ($user['email'] === $email)
+                array_push($errors, "Email already exists");
         }
 
         // Finally, register user if there are no errors in the form
@@ -61,13 +56,9 @@ if (isset($_POST['reg_user'])) {
             $password = password_hash($password_1, PASSWORD_BCRYPT); //encrypt the password before saving in the database
 
             // '".$password."' -> au cas où il y a des espaces
-            $query = "INSERT INTO users (username, email, password, following, follower) VALUES('$username', '$email', '" . $password . "', '', '')";
-            $result = mysqli_query($db, $query);
+            create("users", array("username" => $username, "email" => $email, "password" => $password, "follower" => "", "following" => ""));
 
-            $query = "SELECT * FROM users WHERE username='" . $username . "'";
-            $result = mysqli_query($db, $query);
-
-            set_session_value(mysqli_fetch_assoc($result));
+            set_session_value(find("users", array("username" => $username), 1));
             if (isset($_SESSION['username'])) {
                 array_push($success, "You are now logged in");
                 $_SESSION["success"] = $success;
@@ -82,8 +73,8 @@ if (isset($_POST['reg_user'])) {
 
 // LOGIN USER
 if (isset($_POST['log_user'])) {
-    $username = mysqli_real_escape_string($db, $_POST['log_username']);
-    $password = mysqli_real_escape_string($db, $_POST['log_password']);
+    $username = $_POST['log_username'];
+    $password = $_POST['log_password'];
 
     if (empty($username))
         array_push($errors, "Username is required");
@@ -92,10 +83,8 @@ if (isset($_POST['log_user'])) {
         array_push($errors, "Password is required");
 
     if (count($errors) == 0) {
-        $query = "SELECT * FROM users WHERE username='$username'";
-        $result = mysqli_query($db, $query);
-        $user = mysqli_fetch_assoc($result);
-        if (password_verify($password, $user['password'])) {
+        $user = find("users", array("username" => $username), 1);
+        if ($user && password_verify($password, $user['password'])) {
             set_session_value($user);
             array_push($success, "You are now logged in");
             $_SESSION["success"] = $success;
@@ -112,13 +101,13 @@ if (isset($_POST['set_change'])) {
     $username = $_SESSION['username'];
     $id = $_SESSION['id'];
 
-    $new_username = mysqli_real_escape_string($db, $_POST['set_username']);
-    $new_email = mysqli_real_escape_string($db, $_POST['set_email']);
-    $old_password = mysqli_real_escape_string($db, $_POST['set_old_password']);
-    $new_password = mysqli_real_escape_string($db, $_POST['set_new_password']);
+    $new_username = $_POST['set_username'];
+    $new_email = $_POST['set_email'];
+    $old_password = $_POST['set_old_password'];
+    $new_password = $_POST['set_new_password'];
 
-    $new_firstname = mysqli_real_escape_string($db, $_POST['set_firstname']);
-    $new_lastname = mysqli_real_escape_string($db, $_POST['set_lastname']);
+    $new_firstname = $_POST['set_firstname'];
+    $new_lastname = $_POST['set_lastname'];
 
     // changement de mot de passe tenté
     if (!empty($old_password) || !empty($new_password)) {
@@ -126,18 +115,15 @@ if (isset($_POST['set_change'])) {
             array_push($errors, "You have to enter both the old and the new password to change it");
         }
 
-        $new_password = password_hash($new_password, PASSWORD_BCRYPT);
-        $query = "SELECT password FROM users WHERE username='$username'";
-        $result = mysqli_query($db, $query);
-        $user = mysqli_fetch_assoc($result);
+        $new_password = password_hash($new_password, PASSWORD_BCRYPT);        
+        $user = find("users", array("username" => $username), 1);
 
-        if (!password_verify($old_password, $user['password'])) {
+        if ($user && !password_verify($old_password, $user['password'])) {
             array_push($errors, "Error, the old password is incorrect");
         }
 
         if (count($errors) == 0) {
-            $query = "UPDATE users SET password = '$new_password' WHERE username = '$username'";
-            mysqli_query($db, $query);
+            update("users", array("password" => $new_password), array("username" => $username));
         }
     }
 
@@ -146,33 +132,27 @@ if (isset($_POST['set_change'])) {
             array_push($errors, "Invalid username (characters allowed are letters, numbers and '_', '-')");
         }
 
-        $query = "SELECT username FROM users WHERE username='$new_username'";
-        $result = mysqli_query($db, $query);
-        $user = mysqli_fetch_assoc($result);
+        $user = find("users", array("username" => $new_username), 1);
 
         if ($user) {
             array_push($errors, "That username already exists");
         }
 
         if (count($errors) == 0) {
-            $query = "UPDATE users SET username='$new_username' WHERE id=$id";
-            mysqli_query($db, $query);
+            update("users", array("username" => $new_username), array("id" => $id));
             $_SESSION['username'] = $new_username;
         }
     }
 
     if (!empty($new_email)) {
-        $query = "SELECT username FROM users WHERE email='$new_email'";
-        $result = mysqli_query($db, $query);
-        $user = mysqli_fetch_assoc($result);
+        $user = find("users", array("email" => $new_email), 1, array("username"));
 
         if ($user) {
             array_push($errors, "This email is already used");
         }
 
         if (count($errors) == 0) {
-            $query = "UPDATE users SET email='$new_email' WHERE id=$id";
-            mysqli_query($db, $query);
+            update("users", array("email" => $new_email), array("id" => $id));
         }
     }
 
@@ -180,8 +160,7 @@ if (isset($_POST['set_change'])) {
         if (!is_str_valid($username)) {
             array_push($errors, "Invalid name (characters allowed are letters, numbers and '_', '-')");
         } else {
-            $query = "UPDATE users SET firstname='" . $new_firstname . "' WHERE id=$id";
-            mysqli_query($db, $query);
+            update("users", array("firstname" => $new_firstname), array("id" => $id));
             $_SESSION['firstname'] = $new_firstname;
         }
     }
@@ -190,8 +169,7 @@ if (isset($_POST['set_change'])) {
         if (!is_str_valid($username)) {
             array_push($errors, "Invalid name (characters allowed are letters, numbers and '_', '-')");
         } else {
-            $query = "UPDATE users SET lastname='" . $new_lastname . "' WHERE id=$id";
-            mysqli_query($db, $query);
+            update("users", array("lastname" => $new_lastname), array("id" => $id));
             $_SESSION['lastname'] = $new_lastname;
         }
     }
@@ -207,8 +185,7 @@ if (isset($_POST['set_change'])) {
 if (isset($_POST['set_reset_name'])) {
     $id = $_SESSION['id'];
 
-    $query = "UPDATE users SET firstname=null, lastname=null WHERE id=$id";
-    mysqli_query($db, $query);
+    update("users", array("firstname" => null, "lastname" => null), array("id" => $id));
 
     unset($_SESSION['firstname']);
     unset($_SESSION['lastname']);
@@ -231,7 +208,7 @@ if (isset($_POST['set_avatar']) && isset($_FILES["avatar_file"])) {
         array_push($errors, "The image has to be less than 2 Mo");
     }
 
-    $image_info = getimagesize($_FILES["avatar_file"]["tmp_name"]);
+    $image_info = getimagesize($image);
 
     // vérifie si le fichier est bien une image
     if (!is_array($image_info)) {
@@ -249,8 +226,7 @@ if (isset($_POST['set_avatar']) && isset($_FILES["avatar_file"])) {
         $target = "../avatars/" . $id . ".png";
 
         if (move_uploaded_file($image, $target)) {
-            $sql = "UPDATE users SET avatar='$target' WHERE id=$id";
-            mysqli_query($db, $sql);
+            update("users", array("avatar" => $target), array("id" => $id));
 
             $_SESSION['avatar'] = $target;
             array_push($success, "Image uploaded successfully");
@@ -265,8 +241,7 @@ if (isset($_POST['reset_avatar'])) {
     $id = $_SESSION['id'];
     $reset_image = '../avatars/0.png';
 
-    $sql = "UPDATE users SET avatar='$reset_image' WHERE id=$id";
-    mysqli_query($db, $sql);
+    update("users", array("avatar" => $reset_image), array("id" => $id));
 
     $_SESSION['avatar'] = $reset_image;
     array_push($success, "Avatar reset successfully");
