@@ -72,7 +72,7 @@ if (isset($_POST['post'])) {
                 <input type="text" name="post_title" placeholder="Title">
             </div>
             <div class="input-group">
-                <input type="text" name="post_content" placeholder="Text">
+                <textarea name="post_content" placeholder="Text"></textarea>
             </div>
             <div class="input-group">
                 <button type="submit" class="btn" name="post">Post</button>

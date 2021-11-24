@@ -104,6 +104,9 @@ $(document).ready(function () {
 
       form.find("input").each(function () {
          if ($(this).attr("name") == "edit_title") title = $(this).val();
+      });
+
+      form.find("textarea").each(function () {
          if ($(this).attr("name") == "edit_content") content = $(this).val();
       });
 
@@ -118,14 +121,10 @@ $(document).ready(function () {
          url: "../sn/backend/publication_handle.php",
          type: "post",
          data: { edit_post: 1, post_id: post_id, title: title, content: content },
-         success: function () {
+         success: function (response) {
             form.addClass("hide");
-            post.removeClass("hide");
-
-            post.find(".post_title").text(title);
-            post.find(".post_content").text(content);
-
-            if (post.find("h3").next("p").text() != "Modified") post.find("h3").after("<p>Modified</p>");
+            post.after(response);
+            post.remove();
          }
       });
 
@@ -250,7 +249,7 @@ $(document).ready(function () {
 
       let comment = form.parent().find("div.comment_section#" + comment_id);
 
-      form.find("input").each(function () {
+      form.find("textarea").each(function () {
          if ($(this).attr("name") == "edit_content") content = $(this).val();
       });
 
@@ -265,12 +264,10 @@ $(document).ready(function () {
          url: "../sn/backend/publication_handle.php",
          type: "post",
          data: { edit_comment: 1, comment_id: comment_id, content: content },
-         success: function () {
+         success: function (response) {
             form.addClass("hide");
-            comment.removeClass("hide");
-            comment.find(".comment_content").text(content);
-
-            if (comment.find(".comment_header").next("p").text() != "Modified") comment.find(".comment_header").after("<p>Modified</p>");
+            comment.after(response);
+            comment.remove();
          }
       });
 

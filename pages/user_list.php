@@ -42,9 +42,8 @@ foreach ($_GET as $key => $value) {
         if (isset($_SESSION["showmode"]) && isset($_SESSION[$_SESSION["showmode"]])) {
             $user_list = array();
             foreach ($_SESSION[$_SESSION["showmode"]] as $user_id) {
-                $query = "SELECT * FROM users WHERE id='$user_id'";
-                $result = mysqli_query($db, $query);
-                array_push($user_list, mysqli_fetch_assoc($result));
+                $user = find("users", array("id" => $user_id), 1);
+                array_push($user_list, $user);
             }
 
             if (count($user_list) > 0) {

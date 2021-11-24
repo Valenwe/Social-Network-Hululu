@@ -1,24 +1,19 @@
 <?php
 include('../backend/server.php');
 
-if (!isset($_SESSION['username'])) {
-    array_push($errors, "You must be logged in first");
-    $_SESSION["errors"] = $errors;
-    header("location: /login");
-}
+check_session_variables();
 
 if (isset($_SESSION['target_search'])) {
-    $search = $_SESSION['target_search'];
-    $query = "SELECT * FROM users WHERE username='$search'";
-    $result = mysqli_query($db, $query);
-
-    if ($result)
-        $target =  mysqli_fetch_assoc($result);
+    $target_username = $_SESSION['target_search'];
+} else {
+    $target_username = str_replace("/user=", "", strtok($_SERVER["REQUEST_URI"], "?"));
 }
 
+$target = find("users", array("username" => $target_username), 1);
+
 if (isset($_GET["friend"])) {
-    if (add_follow($db, $target)) {
-        $target = refresh_user($db, $target);
+    if (add_follow($target)) {
+        $target = find("users", array("username" => $target_username), 1);
         array_push($success, "Friend added");
     } else {
         array_push($errors, "Error trying to add friend");
@@ -26,8 +21,8 @@ if (isset($_GET["friend"])) {
 }
 
 if (isset($_GET["unfriend"])) {
-    if (remove_follow($db, $target)) {
-        $target = refresh_user($db, $target);
+    if (remove_follow($target)) {
+        $target = find("users", array("username" => $target_username), 1);
         array_push($success, "Friend removed");
     } else {
         array_push($errors, "Error trying to remove friend");
@@ -57,14 +52,19 @@ if (isset($_GET["send_pm"])) {
     <div class="content">
         <?php include "../backend/popup.php" ?>
         <p><a class="btn" href="/search">Back</a></p>
-        <img class='avatar' src= '<?php echo $target['avatar']; ?>'>
+        <img class='avatar' src='<?php echo $target['avatar']; ?>'>
         <?php if (isset($target)) : ?>
             <?php if (!is_following($target["id"])) : ?>
                 <p><a href=<?php echo strtok($_SERVER["REQUEST_URI"], "?") . "?friend=1" ?>>Add friend</a></p>
             <?php else : ?>
                 <p><a href=<?php echo strtok($_SERVER["REQUEST_URI"], "?")  . "?unfriend=1" ?>>Remove friend</a></p>
-                <p><a href=<?php echo strtok($_SERVER["REQUEST_URI"], "?")  . "?send_pm=1" ?>>Send message</a></p>
+
+                <?php if (is_follower($target["id"])) : ?>
+                    <p><a href=<?php echo strtok($_SERVER["REQUEST_URI"], "?")  . "?send_pm=1" ?>>Send message</a></p>
+                <?php endif ?>
             <?php endif ?>
+
+
 
             <p>Name: <?php if (!empty($target['firstname']) && !empty($target['lastname'])) echo $target['firstname'] . " " . $target['lastname']; ?></p>
             <p>Username: <?php echo $target['username']; ?></p>
