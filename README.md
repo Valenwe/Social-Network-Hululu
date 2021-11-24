@@ -59,7 +59,7 @@ CREATE TABLE `private_messages` (
   `content` longtext CHARACTER SET latin1 NOT NULL,
   `creation_date` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`pm_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 * Then go in its root folder, and create a new directory inside `/htdocs/`, called `sn`
