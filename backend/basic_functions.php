@@ -105,7 +105,7 @@ function find($table, $list_values, $limit = -1, $specific_column = array(), $co
     // Kill connection
     mysqli_kill($db, $db_id);
 
-    if ($limit == 1)
+    if ($limit == 1 && sizeof($list) > 0)
         return $list[0];
     else
         return $list;

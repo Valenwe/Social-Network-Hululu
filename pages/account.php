@@ -28,7 +28,7 @@ $publications = get_most_recent_publication(10, false);
 <head>
     <title>Account Page</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" type="text/css" href="../sn/style.css">
+    <link rel="stylesheet" type="text/css" href="../sn/style.css?version=1">
 </head>
 
 <body>

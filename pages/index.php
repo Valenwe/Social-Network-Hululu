@@ -54,7 +54,7 @@ $displayed_publications = get_most_recent_publication(5, true);
 <head>
     <meta charset="utf-8" />
     <title>Home</title>
-    <link rel="stylesheet" type="text/css" href="../sn/style.css">
+    <link rel="stylesheet" type="text/css" href="../sn/style.css?version=1">
 </head>
 
 <body>

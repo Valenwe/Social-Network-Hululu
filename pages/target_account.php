@@ -41,7 +41,7 @@ if (isset($_GET["send_pm"])) {
 <head>
     <title>Account Page</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" type="text/css" href="../sn/style.css">
+    <link rel="stylesheet" type="text/css" href="../sn/style.css?version=1">
 </head>
 
 <body>

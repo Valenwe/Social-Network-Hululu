@@ -55,7 +55,7 @@ if (isset($_POST['post'])) {
 <head>
     <meta charset="utf-8" />
     <title>Home</title>
-    <link rel="stylesheet" type="text/css" href="../sn/style.css">
+    <link rel="stylesheet" type="text/css" href="../sn/style.css?version=1">
 </head>
 
 <body>
