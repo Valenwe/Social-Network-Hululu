@@ -6,7 +6,7 @@ include('../backend/server.php') ?>
 <head>
     <meta charset="utf-8" />
     <title>Register account</title>
-    <link rel="stylesheet" type="text/css" href="../sn/style.css">
+    <link rel="stylesheet" type="text/css" href="../sn/style.css?version=1">
 </head>
 
 <body>

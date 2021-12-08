@@ -22,10 +22,10 @@ if (isset($_POST['reg_user'])) {
 
     if (empty($_POST['reg_email']))
         array_push($errors, "Email is required");
-    
+
     if (empty($_POST['reg_password_1']))
         array_push($errors, "Password is required");
-    
+
 
     if (!empty($_POST['reg_username']) && !empty($_POST['reg_email']) && !empty($_POST['reg_password_1']) && !empty($_POST['reg_password_2'])) {
         // receive all input values from the form
@@ -36,6 +36,12 @@ if (isset($_POST['reg_user'])) {
 
         if (!is_str_valid($username))
             array_push($errors, "Invalid username (characters allowed are letters, numbers and '_')");
+
+        if (strlen($password_1) <= 5)
+            array_push($errors, "The password has to be at least 6 characters long");
+
+        if (!preg_match('~[0-9]+~', $password_1))
+            array_push($errors, "The password must contain at least one digit number");
 
         if ($password_1 != $password_2)
             array_push($errors, "The two passwords do not match");
@@ -115,7 +121,7 @@ if (isset($_POST['set_change'])) {
             array_push($errors, "You have to enter both the old and the new password to change it");
         }
 
-        $new_password = password_hash($new_password, PASSWORD_BCRYPT);        
+        $new_password = password_hash($new_password, PASSWORD_BCRYPT);
         $user = find("users", array("username" => $username), 1);
 
         if ($user && !password_verify($old_password, $user['password'])) {

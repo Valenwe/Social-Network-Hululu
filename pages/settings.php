@@ -13,7 +13,7 @@ if (!isset($_SESSION['username'])) {
 <head>
     <title>Account Settings</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" type="text/css" href="../sn/style.css">
+    <link rel="stylesheet" type="text/css" href="../sn/style.css?version=1">
 </head>
 
 <body>
