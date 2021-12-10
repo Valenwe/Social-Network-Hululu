@@ -1,6 +1,6 @@
 <?php
-include "../backend/db.php";
-include "../backend/functions.php";
+include "db.php";
+include "functions.php";
 session_start();
 
 if (isset($_POST["send_message"])) {

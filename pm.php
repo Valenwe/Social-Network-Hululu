@@ -1,5 +1,5 @@
 <?php
-include('../backend/server.php');
+include('backend/server.php');
 
 check_session_variables();
 
@@ -17,7 +17,7 @@ if (isset($_SESSION['target_search'])) {
 <head>
     <title>Private Messages</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" type="text/css" href="../sn/style.css?version=1">
+    <link rel="stylesheet" type="text/css" href="style.css?version=1">
 </head>
 
 <body>
@@ -25,11 +25,11 @@ if (isset($_SESSION['target_search'])) {
         <h2>Private Messages</h2>
     </div>
     <div class="content">
-        <p><a class="btn" href="/home">Back</a></p>
+        <p><a class="btn" href="/home.php">Back</a></p>
         <?php echo display_pms($_SESSION["id"], $new_pm_target) ?>
     </div>
-    <script src="../sn/backend/jquery.min.js"></script>
-    <script src="../sn/backend/private_messages.js"></script>
+    <script src="backend/jquery.min.js"></script>
+    <script src="backend/private_messages.js"></script>
 </body>
 
 </html>

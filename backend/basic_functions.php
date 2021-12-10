@@ -55,7 +55,7 @@ function get_valid_str($str)
 // CRUDS functions
 function find($table, $list_values, $limit = -1, $specific_column = array(), $comparator = "AND", $order = false, $value_in = false)
 {
-    require('../backend/db.php');
+    require('db.php');
 
     $columns = "*";
     if (count($specific_column) > 0) {
@@ -113,7 +113,7 @@ function find($table, $list_values, $limit = -1, $specific_column = array(), $co
 
 function update($table, $list_values_to_update, $list_values)
 {
-    require('../backend/db.php');
+    require('db.php');
     $query = "UPDATE " . $table . " SET "; // Create query
     $n = 0;
     foreach ($list_values_to_update as $key => $value) {
@@ -154,7 +154,7 @@ function update($table, $list_values_to_update, $list_values)
 
 function create($table, $list_values)
 {
-    require('../backend/db.php');
+    require('db.php');
     $query = "INSERT INTO " . $table; // Create query
     $args = $values = "";
     foreach ($list_values as $key => $value) {
@@ -180,7 +180,7 @@ function create($table, $list_values)
 
 function delete($table, $list_values)
 {
-    require('../backend/db.php');
+    require('db.php');
 
     $query = "DELETE FROM " . $table . " WHERE "; // Create query
     $n = 0;
@@ -204,13 +204,13 @@ function delete($table, $list_values)
 
 function special_find_query($query)
 {
-    require('../backend/db.php');
+    require('db.php');
 
     $result = mysqli_query($db, $query); // Execute query to database
 
     if (!$result) // Process result / error
         return null;
-    
+
 
     $list = array();
     while ($row = mysqli_fetch_array($result)) {
@@ -227,10 +227,10 @@ function special_find_query($query)
 }
 
 function special_query($query) {
-    require('../backend/db.php');
+    require('db.php');
 
     mysqli_query($db, $query);
-    
+
     $db_id = mysqli_thread_id($db);
     mysqli_kill($db, $db_id);
 }

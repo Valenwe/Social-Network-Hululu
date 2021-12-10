@@ -1,5 +1,5 @@
 <?php
-include('../backend/server.php');
+include('backend/server.php');
 
 check_session_variables();
 
@@ -30,7 +30,7 @@ if (isset($_GET["unfriend"])) {
 }
 
 if (isset($_GET["send_pm"])) {
-    header("location: /pm");
+    header("location: /pm.php");
 }
 
 
@@ -41,7 +41,7 @@ if (isset($_GET["send_pm"])) {
 <head>
     <title>Account Page</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" type="text/css" href="../sn/style.css?version=1">
+    <link rel="stylesheet" type="text/css" href="style.css?version=1">
 </head>
 
 <body>
@@ -50,8 +50,8 @@ if (isset($_GET["send_pm"])) {
     </div>
 
     <div class="content">
-        <?php include "../backend/popup.php" ?>
-        <p><a class="btn" href="/search">Back</a></p>
+        <?php include "backend/popup.php" ?>
+        <p><a class="btn" href="/search.php">Back</a></p>
         <img class='avatar' src='<?php echo $target['avatar']; ?>'>
         <?php if (isset($target)) : ?>
             <?php if (!is_following($target["id"])) : ?>

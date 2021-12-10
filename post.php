@@ -1,5 +1,5 @@
 <?php
-include "../backend/functions.php";
+include "backend/functions.php";
 session_start();
 $errors = array();
 $success = array();
@@ -15,7 +15,7 @@ if (isset($_GET['logout'])) {
     session_destroy();
     unset($_SESSION['username']);
     unset($_SESSION['id']);
-    header("location: /login");
+    header("location: /login.php");
 }
 
 if (isset($_GET['settings'])) {
@@ -23,7 +23,7 @@ if (isset($_GET['settings'])) {
 }
 
 if (isset($_GET['account'])) {
-    header("location: /me");
+    header("location: /me.php");
 }
 
 // POST PUBLICATION
@@ -44,7 +44,7 @@ if (isset($_POST['post'])) {
         post($_SESSION["id"], $title, $content);
         array_push($success, "Publication posted");
         $_SESSION["success"] = $success;
-        header("location: /home");
+        header("location: /home.php");
     }
 }
 
@@ -55,7 +55,7 @@ if (isset($_POST['post'])) {
 <head>
     <meta charset="utf-8" />
     <title>Home</title>
-    <link rel="stylesheet" type="text/css" href="../sn/style.css?version=1">
+    <link rel="stylesheet" type="text/css" href="style.css?version=1">
 </head>
 
 <body>
@@ -65,8 +65,8 @@ if (isset($_POST['post'])) {
     </div>
 
     <div class="content">
-        <p><a class="btn" href="/home">Back</a></p>
-        <?php require "../backend/popup.php" ?>
+        <p><a class="btn" href="/home.php">Back</a></p>
+        <?php require "backend/popup.php" ?>
         <form method="post">
             <div class="input-group">
                 <input type="text" name="post_title" placeholder="Title">

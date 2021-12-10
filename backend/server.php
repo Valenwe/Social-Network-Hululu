@@ -1,5 +1,5 @@
 <?php
-include "../backend/functions.php";
+include "functions.php";
 session_start();
 
 // initializing variables
@@ -46,7 +46,7 @@ if (isset($_POST['reg_user'])) {
         if ($password_1 != $password_2)
             array_push($errors, "The two passwords do not match");
 
-        // first check the database to make sure 
+        // first check the database to make sure
         // a user does not already exist with the same username and/or email
         $user = find("users", array("username" => $username, "email" => $email), 1, array("username", "email"), "OR");
         if ($user) {
@@ -68,7 +68,7 @@ if (isset($_POST['reg_user'])) {
             if (isset($_SESSION['username'])) {
                 array_push($success, "You are now logged in");
                 $_SESSION["success"] = $success;
-                header('location: /home');
+                header('location: /home.php');
             } else {
                 array_push($errors, "Error trying to create a new user");
             }
@@ -94,7 +94,7 @@ if (isset($_POST['log_user'])) {
             set_session_value($user);
             array_push($success, "You are now logged in");
             $_SESSION["success"] = $success;
-            header('location: /home');
+            header('location: /home.php');
         } else {
             array_push($errors, "Wrong username/password combination");
         }
@@ -183,7 +183,7 @@ if (isset($_POST['set_change'])) {
     if (count($errors) == 0) {
         array_push($success, "Changes saved successfully");
         $_SESSION["success"] = $success;
-        header("location: /home");
+        header("location: /home.php");
     }
 }
 

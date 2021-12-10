@@ -10,7 +10,7 @@
 
 ## How to install the project:
 
-* You first need to install XAMPP, 
+* You first need to install XAMPP or WAMP or MAMP,
 * Then go to the Admin page of MySQL (`localhost/phpmyadmin/`), and execute those SQL requests:
 ```
 CREATE DATABASE `hululu`;
@@ -61,8 +61,9 @@ CREATE TABLE `private_messages` (
   PRIMARY KEY (`pm_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
+Alternatively, you can simply import the  `hululu.sql` file directly.
 
-* Then go in its root folder, and create a new directory inside `/htdocs/`, called `sn`
+* Then go in its root folder, inside `/htdocs/`.
 * After that, paste the ZIP content of the repository inside that new directory.
 
 * Then, go in `/apache/conf`, and change the file `httpd.conf`:
@@ -72,9 +73,17 @@ CREATE TABLE `private_messages` (
 * Also, create a .htaccess file in the htdocs folder, and add the following content:
 ```
 RewriteEngine on
-RewriteBase /sn/
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.*)$ url.php [QSA,L]
+Options +FollowSymLinks -MultiViews
+RewriteBase /
+
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+).php
+RewriteRule ^ %1 [R=301,L]
+
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+)/\s
+RewriteRule ^ %1 [R=301,L]
+
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*)$ $1.php [L]
 ```
 
 The website should now be available at `localhost/register`.

@@ -1,6 +1,6 @@
 <?php
 session_start();
-include "../backend/functions.php";
+include "backend/functions.php";
 
 check_session_variables();
 
@@ -15,15 +15,15 @@ if (!empty($_SESSION["success"])) {
 if (isset($_GET['logout'])) {
     session_unset();
     session_destroy();
-    header("location: /login");
+    header("location: /login.php");
 }
 
 if (isset($_GET['settings']))
-    header("location: /settings");
+    header("location: /settings.php");
 
 
 if (isset($_GET['account']))
-    header("location: /me");
+    header("location: /me.php");
 
 
 if (isset($_GET['search'])) {
@@ -31,7 +31,7 @@ if (isset($_GET['search'])) {
         array_push($errors, "Incorrect characters");
     } else {
         $_SESSION['search'] = addslashes(strip_tags($_POST['ind_search_content']));
-        header("location: /search");
+        header("location: /search.php");
     }
 } else {
     // pour retirer la dernière recherche qui ne sert plus
@@ -40,10 +40,10 @@ if (isset($_GET['search'])) {
 }
 
 if (isset($_GET['new_post']))
-    header("location: /post");
+    header("location: /post.php");
 
 if (isset($_GET['pm']))
-    header("location: /pm");
+    header("location: /pm.php");
 
 $displayed_publications = get_most_recent_publication(5, true);
 ?>
@@ -54,20 +54,20 @@ $displayed_publications = get_most_recent_publication(5, true);
 <head>
     <meta charset="utf-8" />
     <title>Home</title>
-    <link rel="stylesheet" type="text/css" href="../sn/style.css?version=1">
+    <link rel="stylesheet" type="text/css" href="style.css?version=1">
 </head>
 
 <body>
 
     <div class="header">
         <h2>Home Page</h2>
-        <p> <a href="/home?new_post=1" style="color:purple;">New publication</a></p>
-        <p> <a href="/home?pm=1" style="color:gray;">Private messages</a></p>
-        <p> <a href="/home?account=1" style="color:green;">Account</a></p>
-        <p> <a href="/home?settings='1'" style="color:blue;">Settings</a></p>
-        <p> <a href="/home?logout='1'" style="color: red;">Logout</a> </p>
+        <p> <a href="/home.php?new_post=1" style="color:purple;">New publication</a></p>
+        <p> <a href="/home.php?pm=1" style="color:gray;">Private messages</a></p>
+        <p> <a href="/home.php?account=1" style="color:green;">Account</a></p>
+        <p> <a href="/home.php?settings='1'" style="color:blue;">Settings</a></p>
+        <p> <a href="/home.php?logout='1'" style="color: red;">Logout</a> </p>
 
-        <form method="post" action="/home?search=1">
+        <form method="post" action="/home.php?search=1">
             <div class="input-group">
                 <input type="text" name="ind_search_content" placeholder="Search">
             </div>
@@ -78,7 +78,7 @@ $displayed_publications = get_most_recent_publication(5, true);
     </div>
     <div class="content">
         <!-- notification message -->
-        <?php require('../backend/popup.php'); ?>
+        <?php require('backend/popup.php'); ?>
 
         <!-- logged in user information -->
         <?php if (isset($_SESSION['username'])) : ?>
@@ -90,10 +90,10 @@ $displayed_publications = get_most_recent_publication(5, true);
     <div class="content publications">
         <?php display_publications($displayed_publications, false) ?>
     </div>
-    
 
-    <script src="../sn/backend/jquery.min.js"></script>
-    <script src="../sn/backend/publications.js"></script>
+
+    <script src="backend/jquery.min.js"></script>
+    <script src="backend/publications.js"></script>
 </body>
 
 </html>

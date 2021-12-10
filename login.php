@@ -1,10 +1,10 @@
-<?php include('../backend/server.php')?>
+<?php include('backend/server.php')?>
 <!DOCTYPE html>
 <html>
 
 <head>
     <title>Login</title>
-    <link rel="stylesheet" type="text/css" href="../sn/style.css?version=1">
+    <link rel="stylesheet" type="text/css" href="style.css?version=1">
 </head>
 
 <body>
@@ -13,7 +13,7 @@
     </div>
 
     <form method="post">
-        <?php require('../backend/popup.php'); ?>
+        <?php require('backend/popup.php'); ?>
         <div class="input-group">
             <label>Username</label>
             <input type="text" name="log_username">
@@ -26,7 +26,7 @@
             <button type="submit" class="btn" name="log_user">Login</button>
         </div>
         <p>
-            Not yet a member? <a href="/register">Sign up</a>
+            Not yet a member? <a href="/register.php">Sign up</a>
         </p>
     </form>
 </body>

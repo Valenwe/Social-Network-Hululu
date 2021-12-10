@@ -1,10 +1,10 @@
 <?php
-include('../backend/server.php');
+include('backend/server.php');
 
 if (!isset($_SESSION['username'])) {
     array_push($errors, "You must be logged in first");
     $_SESSION["errors"] = $errors;
-    header('location: /login');
+    header('location: /login.php');
 }
 
 foreach ($_GET as $key => $value) {
@@ -15,9 +15,9 @@ foreach ($_GET as $key => $value) {
         $_SESSION['target_search'] = get_valid_str($_SESSION['target_search']);
         // si on clique sur notre compte
         if ($_SESSION["username"] == $_SESSION["target_search"]) {
-            header("location: /me");
+            header("location: /me.php");
         } else {
-            header("location: /user=" . $_SESSION['target_search']);
+            header("location: /user.php?id=" . $_SESSION['target_search']);
         }
     }
 }
@@ -28,7 +28,7 @@ foreach ($_GET as $key => $value) {
 
 <head>
     <title>Search</title>
-    <link rel="stylesheet" type="text/css" href="../sn/style.css?version=1">
+    <link rel="stylesheet" type="text/css" href="style.css?version=1">
 </head>
 
 <body>
@@ -36,7 +36,7 @@ foreach ($_GET as $key => $value) {
         <h2>Search results</h2>
     </div>
     <div class="content">
-        <p><a class="btn" href="/home">Back</a></p>
+        <p><a class="btn" href="/home.php">Back</a></p>
         <?php
 
         if (isset($_SESSION['search'])) {
@@ -57,7 +57,7 @@ foreach ($_GET as $key => $value) {
                             $display .= $row["lastname"];
                     }
                     $search_username = $row['username'];
-                    echo "<p><a href='/search?target=user_$search_username'>" . $display . "</a></p><br>";
+                    echo "<p><a href='/search.php?target=user_$search_username'>" . $display . "</a></p><br>";
                 }
             } else {
                 echo "No results";

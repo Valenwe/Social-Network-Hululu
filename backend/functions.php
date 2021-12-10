@@ -1,5 +1,5 @@
 <?php
-include "../backend/basic_functions.php";
+include "basic_functions.php";
 // on attribue toutes les valeurs de la session (pour du local)
 function set_session_value($user)
 {
@@ -39,7 +39,7 @@ function check_session_variables()
 
         $_SESSION["errors"] = array();
         array_push($_SESSION["errors"], "You must be logged in first");
-        header('location: /login');
+        header('location: /login.php');
     }
 }
 
@@ -107,7 +107,7 @@ function remove_follow($friend)
 
 // poste une publication
 // '" . $title . "' pour prendre en compte les espaces
-// addslashes permet de gérer les caractères problématiques comme ' \ " 
+// addslashes permet de gérer les caractères problématiques comme ' \ "
 function post($id, $title, $content)
 {
     create("publications", array("id" => $id, "title" => $title, "content" => $content, "likes" => ""));
@@ -155,7 +155,7 @@ function display_comment($comment)
     $date = $comment["creation_date"];
 
     $html = "<div class='comment_section' id=$comment_id>";
-    $html .= "<p class='comment_header'>By <a href='/search?target=user_$username'>$username</a> | $date</p>";
+    $html .= "<p class='comment_header'>By <a href='/search.php?target=user_$username'>$username</a> | $date</p>";
 
     if ($comment["modified"] == 1) $html .= "<p>Modified</p>";
 
@@ -254,7 +254,7 @@ function display_publications($publications, $edited)
             $date_time = new DateTime($post['creation_date']);
             $date = $date_time->format('d/m/y H:i');
 
-            $html .= "<a href='/search?target=user_$author_name'><img class='lil_avatar' src='$avatar'></a>";
+            $html .= "<a href='/search.php?target=user_$author_name'><img class='lil_avatar' src='$avatar'></a>";
             $html .= "<h3 class='post_title'>$title</h3>";
 
             if ($post["modified"]) $html .= "<p>Modified</p>";
@@ -266,7 +266,7 @@ function display_publications($publications, $edited)
                 $html .= "<span class='edit_post interactable' data-id=$post_id>Edit</span>";
             }
 
-            $html .= "<p>From <a href='/search?target=user_$author_name'>$author_name</a></p> </br>";
+            $html .= "<p>From <a href='/search.php?target=user_$author_name'>$author_name</a></p> </br>";
 
             $html .= "<p class='post_content'>" . enrich_content($content) . "</p>";
 
@@ -355,7 +355,7 @@ function display_conversation($target_id, $limit, $hidden)
 
     // title
     $response = "<div class='content' id=$target_id>";
-    $response .= "<a href='/search?target=user_$target_username'> <h3>$target_username</h3> </a>";
+    $response .= "<a href='/search.php?target=user_$target_username'> <h3>$target_username</h3> </a>";
 
     if ($hidden) {
         $response .= "<span class='show_conversation interactable'>Expand</span>";

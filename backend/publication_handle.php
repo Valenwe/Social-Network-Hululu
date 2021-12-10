@@ -1,5 +1,5 @@
 <?php
-include "../backend/functions.php";
+include "functions.php";
 session_start();
 
 if (isset($_POST["delete_post"])) {

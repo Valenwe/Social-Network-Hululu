@@ -1,10 +1,10 @@
 <?php
-include('../backend/server.php');
+include('backend/server.php');
 
 if (!isset($_SESSION['username'])) {
     array_push($errors, "You must be logged in first");
     $_SESSION["errors"] = $errors;
-    header('location: /login');
+    header('location: /login.php');
 }
 ?>
 <!DOCTYPE html>
@@ -13,15 +13,15 @@ if (!isset($_SESSION['username'])) {
 <head>
     <title>Account Settings</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" type="text/css" href="../sn/style.css?version=1">
+    <link rel="stylesheet" type="text/css" href="style.css?version=1">
 </head>
 
 <body>
     <!-- enctype allows the transmission to PHP -->
     <form method="post" enctype="multipart/form-data">
 
-        <?php require('../backend/popup.php'); ?>
-        <p><a class="btn" href="/home">Back</a></p>
+        <?php require('backend/popup.php'); ?>
+        <p><a class="btn" href="/home.php">Back</a></p>
 
         <div class="input-group">
             <label>Upload avatar image</label>

@@ -5,7 +5,7 @@ $(document).ready(function () {
       $post = $(this);
 
       $.ajax({
-         url: "../sn/backend/publication_handle.php",
+         url: "backend/publication_handle.php",
          type: "post",
          data: {
             like: 1,
@@ -29,7 +29,7 @@ $(document).ready(function () {
       $post = $(this);
 
       $.ajax({
-         url: "../sn/backend/publication_handle.php",
+         url: "backend/publication_handle.php",
          type: "post",
          data: {
             dislike: 1,
@@ -55,7 +55,7 @@ $(document).ready(function () {
       $post = $(this);
 
       $.ajax({
-         url: "../sn/backend/publication_handle.php",
+         url: "backend/publication_handle.php",
          type: "post",
          data: {
             delete_post: 1,
@@ -118,7 +118,7 @@ $(document).ready(function () {
       }
 
       $.ajax({
-         url: "../sn/backend/publication_handle.php",
+         url: "backend/publication_handle.php",
          type: "post",
          data: { edit_post: 1, post_id: post_id, title: title, content: content },
          success: function (response) {
@@ -147,7 +147,7 @@ $(document).ready(function () {
          counter.val(row);
 
          $.ajax({
-            url: "../sn/backend/function_caller.php",
+            url: "backend/function_caller.php",
             type: "post",
             data: { row: row, function: "get_and_display_publications" },
             success: function (response) {
@@ -182,7 +182,7 @@ $(document).ready(function () {
       let content = content_element.val();
 
       $.ajax({
-         url: "../sn/backend/publication_handle.php",
+         url: "backend/publication_handle.php",
          type: "post",
          data: { add_comment: 1, post_id: post_id, content: content },
          success: function (response) {
@@ -202,7 +202,7 @@ $(document).ready(function () {
       $comment = $(this);
 
       $.ajax({
-         url: "../sn/backend/publication_handle.php",
+         url: "backend/publication_handle.php",
          type: "post",
          data: {
             delete_comment: 1,
@@ -261,7 +261,7 @@ $(document).ready(function () {
       }
 
       $.ajax({
-         url: "../sn/backend/publication_handle.php",
+         url: "backend/publication_handle.php",
          type: "post",
          data: { edit_comment: 1, comment_id: comment_id, content: content },
          success: function (response) {
@@ -292,7 +292,7 @@ $(document).ready(function () {
          counter.val(row);
 
          $.ajax({
-            url: "../sn/backend/function_caller.php",
+            url: "backend/function_caller.php",
             type: "post",
             data: { row: row, post_id: post_id, function: "get_and_display_comments" },
             success: function (response) {
