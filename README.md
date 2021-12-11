@@ -61,7 +61,7 @@ CREATE TABLE `private_messages` (
   PRIMARY KEY (`pm_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
-Alternatively, you can simply import the  `hululu.sql` file directly.
+* Alternatively, you can simply import the  `hululu.sql` file directly.
 
 * Then go in its root folder, inside `/htdocs/`.
 * After that, paste the ZIP content of the repository inside that new directory.
