@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.1.0
+-- version 5.1.1
 -- https://www.phpmyadmin.net/
 --
--- Hôte : localhost:8889
--- Généré le : mer. 24 nov. 2021 à 13:09
--- Version du serveur :  5.7.34
--- Version de PHP : 8.0.8
+-- Hôte : 127.0.0.1
+-- Généré le : sam. 11 déc. 2021 à 17:31
+-- Version du serveur : 10.4.21-MariaDB
+-- Version de PHP : 8.0.10
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -20,26 +20,20 @@ SET time_zone = "+00:00";
 --
 -- Base de données : `hululu`
 --
-CREATE DATABASE IF NOT EXISTS `hululu` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `hululu`;
 
 -- --------------------------------------------------------
 
 --
 -- Structure de la table `comments`
 --
--- Création : mer. 24 nov. 2021 à 13:02
---
 
-DROP TABLE IF EXISTS `comments`;
-CREATE TABLE IF NOT EXISTS `comments` (
-  `comment_id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `comments` (
+  `comment_id` int(11) NOT NULL,
   `post_id` int(11) NOT NULL,
   `id` int(11) NOT NULL,
   `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `modified` int(11) NOT NULL DEFAULT '0',
-  `creation_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`comment_id`)
+  `modified` int(11) NOT NULL DEFAULT 0,
+  `creation_date` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -47,17 +41,13 @@ CREATE TABLE IF NOT EXISTS `comments` (
 --
 -- Structure de la table `private_messages`
 --
--- Création : mer. 24 nov. 2021 à 13:02
---
 
-DROP TABLE IF EXISTS `private_messages`;
-CREATE TABLE IF NOT EXISTS `private_messages` (
-  `pm_id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `private_messages` (
+  `pm_id` int(11) NOT NULL,
   `id1` int(11) NOT NULL,
   `id2` int(11) NOT NULL,
   `content` longtext CHARACTER SET latin1 NOT NULL,
-  `creation_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`pm_id`)
+  `creation_date` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -65,19 +55,15 @@ CREATE TABLE IF NOT EXISTS `private_messages` (
 --
 -- Structure de la table `publications`
 --
--- Création : mer. 24 nov. 2021 à 13:02
---
 
-DROP TABLE IF EXISTS `publications`;
-CREATE TABLE IF NOT EXISTS `publications` (
-  `post_id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `publications` (
+  `post_id` int(11) NOT NULL,
   `id` int(11) NOT NULL,
   `title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `creation_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `creation_date` datetime NOT NULL DEFAULT current_timestamp(),
   `likes` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `modified` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`post_id`)
+  `modified` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -85,23 +71,75 @@ CREATE TABLE IF NOT EXISTS `publications` (
 --
 -- Structure de la table `users`
 --
--- Création : mer. 24 nov. 2021 à 13:02
---
 
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE IF NOT EXISTS `users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
   `username` varchar(100) CHARACTER SET latin1 NOT NULL,
   `email` varchar(100) CHARACTER SET latin1 NOT NULL,
   `password` varchar(100) CHARACTER SET latin1 NOT NULL,
   `avatar` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'avatars/0.png',
   `firstname` varchar(100) CHARACTER SET latin1 DEFAULT NULL,
   `lastname` varchar(100) CHARACTER SET latin1 DEFAULT NULL,
-  `creation_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `creation_date` datetime NOT NULL DEFAULT current_timestamp(),
   `following` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `follower` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  PRIMARY KEY (`id`)
+  `follower` longtext COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Index pour les tables déchargées
+--
+
+--
+-- Index pour la table `comments`
+--
+ALTER TABLE `comments`
+  ADD PRIMARY KEY (`comment_id`);
+
+--
+-- Index pour la table `private_messages`
+--
+ALTER TABLE `private_messages`
+  ADD PRIMARY KEY (`pm_id`);
+
+--
+-- Index pour la table `publications`
+--
+ALTER TABLE `publications`
+  ADD PRIMARY KEY (`post_id`);
+
+--
+-- Index pour la table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT pour les tables déchargées
+--
+
+--
+-- AUTO_INCREMENT pour la table `comments`
+--
+ALTER TABLE `comments`
+  MODIFY `comment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT pour la table `private_messages`
+--
+ALTER TABLE `private_messages`
+  MODIFY `pm_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT pour la table `publications`
+--
+ALTER TABLE `publications`
+  MODIFY `post_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT pour la table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
