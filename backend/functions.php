@@ -308,7 +308,7 @@ function display_publications($publications, $edited)
         }
 
         if (count($publications) % 5 != 0 && !$edited)
-            $html .= "<p>End of the publications</p>";
+            $html .= "<div class='content'> <p>End of the publications</p> </div>";
     } else {
         $html .= "<div class='content'> <p> No publications yet </p> </div>";
     }
