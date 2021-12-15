@@ -237,7 +237,12 @@ function display_publications($publications, $edited)
             $post_id = $post["post_id"];
 
             // id est nécessaire pour localiser le post si on le delete
-            $html .= "<div class='content post' id=$post_id>";
+            if (end($publications) == $post && count($publications) % 5 == 0)
+                $html .= "<div class='content post end' id=$post_id>";
+            else if ($publications[0] == $post)
+                $html .= "<div class='content post beginning' id=$post_id>";
+            else
+                $html .= "<div class='content post' id=$post_id>";
 
             $likes = array();
             if (!empty($post["likes"])) {
@@ -308,9 +313,9 @@ function display_publications($publications, $edited)
         }
 
         if (count($publications) % 5 != 0 && !$edited)
-            $html .= "<div class='content'> <p>End of the publications</p> </div>";
+            $html .= "<div class='content end'> <p>End of the publications</p> </div>";
     } else {
-        $html .= "<div class='content'> <p> No publications yet </p> </div>";
+        $html .= "<div class='content end'> <p> No publications yet </p> </div>";
     }
 
     if (!$edited) {

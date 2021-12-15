@@ -27,6 +27,13 @@ form,
    padding: 20px;
    border: 1px solid #b0c4de;
    background: white;
+}
+
+.beginning {
+   border-radius: 10px 10px 0px 0px;
+}
+
+.end {
    border-radius: 0px 0px 10px 10px;
 }
 
@@ -103,7 +110,7 @@ form,
 
 .post, .message {
    border-style: dotted dashed solid double;
-   border: 2px solid black;
+   border: 1px solid black;
 }
 
 .content_code {
