@@ -66,7 +66,7 @@ if (isset($_GET["send_pm"])) {
 
 
 
-            <p>Name: <?php if (!empty($target['firstname']) && !empty($target['lastname'])) echo $target['firstname'] . " " . $target['lastname']; ?></p>
+            <?php if (!empty($target['firstname']) && !empty($target['lastname'])) echo "<p>Name:" . $target['firstname'] . " " . $target['lastname'] . "</p>"; ?>
             <p>Username: <?php echo $target['username']; ?></p>
             <p>Followers: <?php if (!empty($target['follower'])) echo count(explode(" ", $target['follower']));
                             else echo 0; ?></p>
