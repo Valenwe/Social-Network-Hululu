@@ -4,13 +4,6 @@
 The purpose of this project is to use any tool we want in order to develop a working Social Network from scratch (here called HULULU).
 For that, we use PHP as the backend language, and JavaScript for the frontend.
 
-## Members:
-* Victor
-* Cedric
-* Michael
-* Baptiste
-* Louis
-
 ## How to install the project:
 
 * You first need to install XAMPP or WAMP or MAMP,
