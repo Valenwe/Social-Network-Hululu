@@ -1,6 +1,9 @@
 # Web project
 # social-network
 
+The purpose of this project is to use any tool we want in order to develop a working Social Network from scratch.
+For that, we use PHP as the backend language, and JavaScript for the frontend.
+
 ## Members:
 * Victor
 * Cedric
