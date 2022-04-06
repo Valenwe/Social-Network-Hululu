@@ -22,7 +22,7 @@ $(document).ready(function () {
       content = input.val();
 
       $.ajax({
-         url: "backend/private_message_handle.php",
+         url: "backend/private_message_handle",
          type: "post",
          data: { send_message: 1, target_id: target_id, content: content },
          success: function (response) {
@@ -46,7 +46,7 @@ $(document).ready(function () {
          counter.val(row);
 
          $.ajax({
-            url: "backend/function_caller.php",
+            url: "backend/function_caller",
             type: "post",
             data: { row: row, target_id: target_id, hidden: 0, function: "get_and_display_messages" },
             success: function (response) {
@@ -73,7 +73,7 @@ $(document).ready(function () {
 
             has_new_messages = false;
             $.ajax({
-               url: "backend/function_caller.php",
+               url: "backend/function_caller",
                type: "post",
                data: { target_id: target_id, last_message_id: last_message_id, function: "has_new_messages" },
                success: function (response) {
@@ -82,7 +82,7 @@ $(document).ready(function () {
                   // s'il y a un nouveau message
                   if (has_new_messages == 1) {
                      $.ajax({
-                        url: "backend/function_caller.php",
+                        url: "backend/function_caller",
                         type: "post",
                         data: { row: counter.val(), target_id: target_id, hidden: hidden, function: "get_and_display_messages" },
                         success: function (response) {
