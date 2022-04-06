@@ -1,12 +1,8 @@
 # Web project
 # social-network
 
-## Members:
-* Victor
-* Cedric
-* Michael
-* Baptiste
-* Louis
+The purpose of this project is to use any tool we want in order to develop a working Social Network from scratch (here called HULULU).
+For that, we use PHP as the backend language, and JavaScript for the frontend.
 
 ## How to install the project:
 
